@@ -1,10 +1,12 @@
 import json
-
+import bcrypt
 users = {}
 
 def register_user():
     username = input("Enter username: ")
     password = input("Enter password: ")
+    password.strip()
+    username.strip()
     try:
         with open('users.json', 'r') as file:
             existing_users = json.load(file)
@@ -33,11 +35,13 @@ def user_login():
         print("Invalid username or password")
 
 if __name__ == "__main__":
-    login_or_register = input("Enter 1 to register, 2 to login: ")
-    if login_or_register == '1':
-        register_user()
-    elif login_or_register == '2':
-        user_login()
-    else:
-        print("Invalid choice")
-   
+    while True:
+        login_or_register = input("Enter 1 to register, 2 to login: ")
+        if login_or_register == '1':
+            register_user()
+            break
+        elif login_or_register == '2':
+            user_login()
+            break
+        else:
+            print("Invalid choice, please try again.")
