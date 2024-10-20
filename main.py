@@ -12,7 +12,6 @@ def user_exist(login_or_register):
             register_user()
             break
         elif login_or_register == 'L' or login_or_register == 'l':
-            print('Welcome Back!')
             print('LOGIN')
             user_login()
             break
