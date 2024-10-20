@@ -1,6 +1,8 @@
 import json
 import getpass
+import bcrypt
 # from encrypt import encrypt_password
+from menu_options import help
 
 USERS_FILE = 'users.json' 
 
@@ -12,13 +14,16 @@ def register_user():
     username = input("Enter Username: ")
     # getpass wil hide the password for security purposes
     password = getpass.getpass("Enter Password: ")
-    confirm_password = getpass.getpass("Confirm Password: ")
+    # strip of any spaces
     password.strip()
     username.strip()
 
-    hashed_password = password
+    salt = bcrypt.gensalt()
+    # bcrypt requires the password to be in bytes and not strings, converting
+    hashed_password = bcrypt.hashpw(password.encode(), salt)
+    confirm_password = getpass.getpass("Confirm Password: ")
 
-    if(password == confirm_password):
+    if bcrypt.checkpw(confirm_password.encode(), hashed_password):
         print("\nPasswords Matched.")
 
         try:
@@ -27,7 +32,7 @@ def register_user():
         except FileNotFoundError:
             existing_users = {}
 
-        existing_users[username] = password
+        existing_users[username] = hashed_password.decode()
 
         with open(USERS_FILE, 'w') as file:
             json.dump(existing_users, file, indent=4)
@@ -40,14 +45,23 @@ def user_login():
     username = input("Enter Username: ")
     password = getpass.getpass("Enter Password: ")
     print("Welcome to SecureDrop")
+    menu = input("Type 'H' for help, or press ENTER to continue: ")
+    
+    while menu:
+        if menu == 'H' or menu == 'h':
+            help()
+            break
+        elif menu == '':
+            try:
+                with open(USERS_FILE, 'r') as file:
+                    existing_users = json.load(file)
+            except FileNotFoundError:
+                existing_users = {}
 
-    try:
-        with open(USERS_FILE, 'r') as file:
-            existing_users = json.load(file)
-    except FileNotFoundError:
-        existing_users = {}
-
-    if username in existing_users and existing_users[username] == password:
-        print(f"User {username} Logged in Successfully!")
-    else:
-        print("Invalid Username or Password")
+            if username in existing_users and existing_users[username] == password:
+                print(f"User {username} Logged in Successfully!")
+            else:
+                print("Invalid Username or Password")
+            break
+        else:
+            continue

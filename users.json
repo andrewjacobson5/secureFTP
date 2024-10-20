@@ -1,4 +1,6 @@
 {
     "ty": "ty",
-    "rt": "rt"
+    "rt": "rt",
+    "pati": "somepassword",
+    "pp": "$2b$12$uFQTF1s2dO6xX/t0D3kEqOLdZjyiS8NIghSoJQeFswAoAWXKHSLPW"
 }
