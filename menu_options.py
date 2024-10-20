@@ -4,7 +4,7 @@ def help():
 
     print("'A' -> Add a new contact")
     print("'L' -> List all online contacts")
-    print("'S -> Transfer file to contact")
+    print("'S' -> Transfer file to contact")
     print("'E' -> Exit SecureDrop\n")
 
     # user_selection = input("Enter One of the Options Above: ")

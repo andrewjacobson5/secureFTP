@@ -17,7 +17,7 @@ def user_exist(login_or_register):
             break
         else:
             print("Invalid choice, please try again.")
-            login_or_register = input("Enter Correct Selection: ")
+            login_or_register = input("\nEnter Correct Selection: ")
             continue
 
 
@@ -35,8 +35,8 @@ if __name__ == "__main__":
                 data = json.load(file)
 
                 if data == {}:
-                    print("No users are registered with this client.")
-                    login_or_register = input("Do you want to register a new user (y/n)? ")
+                    print("\nNo users are registered with this client.")
+                    login_or_register = input("\nDo you want to register a new user (y/n)? ")
 
                     if login_or_register == 'y' or login_or_register == 'Y':
                         user_exist('y' or 'Y')
@@ -45,11 +45,11 @@ if __name__ == "__main__":
                         print("QUITTING")
                         break
                     else:
-                        print("Invalid choice, please try again.")
-                        login_or_register = input("Enter Correct Selection: ")
+                        print("\nInvalid choice, please try again.")
+                        login_or_register = input("\nEnter Correct Selection: ")
                         continue
                 else:
-                    print("An User Exists in This Machine.")
-                    login_or_register = input("Enter 'L' to login, or 'R' to register a new user: ")
+                    print("\nAn User Exists in This Machine.")
+                    login_or_register = input("\nEnter 'L' to login, or 'R' to register a new user: ")
                     user_exist(login_or_register)
                     break

@@ -11,7 +11,7 @@ def register_user():
     # we should include these. Commented out for now to make it easier for us to test - PA
     # fullname = input("Enter Full Name: ")
     # email = input("Enter Email Address: ")
-    username = input("Enter Username: ")
+    username = input("\nEnter Username: ")
     # getpass wil hide the password for security purposes
     password = getpass.getpass("Enter Password: ")
     # strip of any spaces
@@ -39,13 +39,13 @@ def register_user():
         
         print(f"User {username} Registered Successfully!")
     else:
-        print("Passwords Do Not Match. Quitting.")
+        print("\nPasswords Do Not Match. Quitting.")
 
 def user_login():
-    username = input("Enter Username: ")
+    username = input("\nEnter Username: ")
     password = getpass.getpass("Enter Password: ")
-    print("Welcome to SecureDrop")
-    menu = input("Type 'H' for help, or press ENTER to continue: ")
+    print("\nWELCOME TO SECUREDROP!")
+    menu = input("\nType 'H' for help, or press ENTER to continue: ")
     
     while menu:
         if menu == 'H' or menu == 'h':
@@ -61,7 +61,8 @@ def user_login():
             if username in existing_users and existing_users[username] == password:
                 print(f"User {username} Logged in Successfully!")
             else:
-                print("Invalid Username or Password")
+                print("\nInvalid Username or Password")
             break
         else:
-            continue
+            print("Incorrect Entry. Quitting.")
+            break
