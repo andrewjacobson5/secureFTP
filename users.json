@@ -1,3 +1,6 @@
 {
-    "andrew": "andrew"
+    "paul": {
+        "name": "paul",
+        "password": "$2b$12$RNsBw0RFzkGCqI5nJTct1.Z4sCmqD7OUADQ2HsRss4L.wBlZSgaUK"
+    }
 }

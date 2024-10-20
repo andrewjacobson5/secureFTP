@@ -1,29 +1,46 @@
 import json
-from encrypt import encrypt_password
+import os
+from encrypt import encrypt_password, check_password
 
 def register_user():
-    username = input("Enter username: ")
+    name = input("Enter full name: ")
+    email = input("Enter email: ")
+
+    try:
+        with open('users.json', 'r') as file:
+            existing_users = json.load(file)
+    except FileNotFoundError:
+        existing_users = {}
+
+    if email in existing_users:
+        print("A user is already registered with that email.")
+        return
+
     password = input("Enter password: ")
-    password.strip()
-    username.strip()
 
     hashed_password = encrypt_password(password)
 
-    try:
-        with open('users.json', 'r') as file:
-            existing_users = json.load(file)
-    except FileNotFoundError:
-        existing_users = {}
+    existing_users[email] = {
+        "name": name,
+        "password": hashed_password
+    }
 
-    existing_users[username] = hashed_password
+    save_user(existing_users)
+    
+    print(f"User {email} registered successfully!")
 
+def save_user(existing_users):
     with open('users.json', 'w') as file:
         json.dump(existing_users, file, indent=4)
-    
-    print(f"User {username} registered successfully!")
+
+def load_users():
+    if os.path.exists('users.json'):
+        with open('users.json', 'r') as file:
+            return json.load(file)
+    return {}
 
 def user_login():
-    username = input("Enter username: ")
+    email = input("Enter email: ")
     password = input("Enter password: ")
     try:
         with open('users.json', 'r') as file:
@@ -31,7 +48,8 @@ def user_login():
     except FileNotFoundError:
         existing_users = {}
 
-    if username in existing_users and existing_users[username] == password:
-        print(f"User {username} logged in successfully!")
+
+    if email in existing_users and check_password(existing_users[email]["password"], password):
+        print(f"User {email} logged in successfully!")
     else:
-        print("Invalid username or password")
+        print("Invalid email or password")
