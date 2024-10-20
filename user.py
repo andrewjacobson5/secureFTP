@@ -1,5 +1,5 @@
 import json
-from encrypt import encrypt_password
+# from encrypt import encrypt_password
 
 def register_user():
     username = input("Enter username: ")
@@ -7,7 +7,7 @@ def register_user():
     password.strip()
     username.strip()
 
-    hashed_password = encrypt_password(password)
+    hashed_password = password
 
     try:
         with open('users.json', 'r') as file:
@@ -15,7 +15,7 @@ def register_user():
     except FileNotFoundError:
         existing_users = {}
 
-    existing_users[username] = hashed_password
+    existing_users[username] = password
 
     with open('users.json', 'w') as file:
         json.dump(existing_users, file, indent=4)
