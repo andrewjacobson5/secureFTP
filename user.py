@@ -2,6 +2,10 @@ import json
 # from encrypt import encrypt_password
 
 def register_user():
+    # I have commented full name and address out for now, but according to the instructions,
+    # we should include these. Commented out for now to make it easier for us to test - PA
+    # fullname = input("Enter Full Name: ")
+    # email = input("Enter Email Address: ")
     username = input("Enter username: ")
     password = input("Enter password: ")
     password.strip()
