@@ -3,6 +3,7 @@ import getpass
 import bcrypt
 # from encrypt import encrypt_password
 from menu_options import help
+from contacts import listContacts
 
 USERS_FILE = 'users.json' 
 
@@ -45,11 +46,15 @@ def user_login():
     username = input("\nEnter Username: ")
     password = getpass.getpass("Enter Password: ")
     print("\nWELCOME TO SECUREDROP!")
-    menu = input("\nType 'H' for help, or press ENTER to continue: ")
+    menu = input("\nType 'H' for help, 'L' to list contacts, or press ENTER to continue: ")
     
     while menu:
         if menu == 'H' or menu == 'h':
             help()
+            break
+        elif menu == 'L' or menu == 'l':
+            #listContacts(user) need to get current user and pass to listContacts
+            print("Listing contacts:")
             break
         elif menu == '':
             try:

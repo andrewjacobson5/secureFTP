@@ -3,7 +3,7 @@ def help():
     print("\nHelp Menu:\n")
 
     print("'A' -> Add a new contact")
-    print("'L' -> List all online contacts")
+    print("'C' -> List all online contacts")
     print("'S' -> Transfer file to contact")
     print("'E' -> Exit SecureDrop\n")
 
