@@ -4,6 +4,7 @@ import bcrypt
 # from encrypt import encrypt_password
 from menu_options import help
 from contacts import listContacts
+from encrypt import encrypt_password, check_password
 
 USERS_FILE = 'users.json' 
 
@@ -21,10 +22,12 @@ def register_user():
 
     salt = bcrypt.gensalt()
     # bcrypt requires the password to be in bytes and not strings, converting
-    hashed_password = bcrypt.hashpw(password.encode(), salt)
+    hashed_password = encrypt_password(password)
+    #hashed_password = bcrypt.hashpw(password.encode(), salt)
     confirm_password = getpass.getpass("Confirm Password: ")
 
-    if bcrypt.checkpw(confirm_password.encode(), hashed_password):
+    if check_password(confirm_password.encode(), hashed_password):
+    #if bcrypt.checkpw(confirm_password.encode(), hashed_password):
         print("\nPasswords Matched.")
 
         try:
