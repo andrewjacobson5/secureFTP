@@ -22,10 +22,13 @@ First, you will need to generate SSL/TLS certificates for mutual authentication:
 **run:**\
 `./generate_certificates.sh` which contains all commands needed to generate the required certificates
 
+if you are unable to run the bash file due to file restrictions, run:\
+`chmod 755 generate_certs.sh`
+
 **then run:**\
 `make install` to install dependencies from requirements.txt
 
-**and:88\
+**and:**\
 `make run` to run the program
 
 **To clean (removes certificates and cleans cache):**\
@@ -46,7 +49,7 @@ Project Milestone 1-3:
 
 @version: 1.0.0.1 - initial commit - Project part 1\
 @version: 1.1.2.5 - Milestone 1 basic user registration\
-@version: 1.1.4.14 - bcrypt
+@version: 1.1.4.14 - bcrypt\
 @version: 1.1.5.1 - SSL/TLS certificates
 - space holder for future part 1 versions
 
