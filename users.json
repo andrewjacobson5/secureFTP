@@ -1,8 +1,14 @@
 {
-    "ty": "ty",
-    "rt": "rt",
-    "pati": "somepassword",
-    "pp": "$2b$12$uFQTF1s2dO6xX/t0D3kEqOLdZjyiS8NIghSoJQeFswAoAWXKHSLPW",
-    "newusertest": "$2b$12$NI7SQj02CmWKZJDhmIcOPuz.3EwNHFAbxpDEFR5RgpNVTYPOCiGlW",
-    "andrew": "$2b$12$4QnhvMClkuJEOje0qp/T9OiT3M2w0lRyNti9xly0ejaj4UAy37rJ6"
+    "p@email.com": {
+        "username": "Patricia Antlitz",
+        "password": "JDJiJDEyJDhRMzJDa3QweWFHNzBXbW13M0lZU092ZjhuSEhjLzJwbjBJOWZFMXMzNG54cjdXVUNGbnNP"
+    },
+    "john@doe.com": {
+        "username": "John Doe",
+        "password": "JDJiJDEyJFJaLzd3cVd6Q00ua2NsUlNEMlJIemVkUWN1c3pJTDBTaFFmc1ZyektFdlFxaHNGRm8zQVZL"
+    },
+    "jojo@doe.com": {
+        "username": "Joan Doe",
+        "password": "JDJiJDEyJFFnSWxPZC9Ea1p5bXF2b2NqNGRzUmUzYzYxdnAyTFUwOHVpLkxyR3hQekRNRkNwZ2hISExl"
+    }
 }

@@ -1,76 +1,85 @@
+import os
 import json
 import getpass
-import bcrypt
 # from encrypt import encrypt_password
-from menu_options import help
+from menu_options import menu_options
 from contacts import listContacts
 from encrypt import encrypt_password, check_password
 
 USERS_FILE = 'users.json' 
+
+username = ''
+password = ''
+email = ''
 
 def register_user():
     # I have commented full name and address out for now, but according to the instructions,
     # we should include these. Commented out for now to make it easier for us to test - PA
     # fullname = input("Enter Full Name: ")
     # email = input("Enter Email Address: ")
-    username = input("\nEnter Username: ")
+    username = input('\nEnter Full Name: ')
+    email = input('Enter Email: ').lower()
     # getpass wil hide the password for security purposes
-    password = getpass.getpass("Enter Password: ")
-    # strip of any spaces
-    password.strip()
-    username.strip()
-
-    salt = bcrypt.gensalt()
-    # bcrypt requires the password to be in bytes and not strings, converting
-    hashed_password = encrypt_password(password)
-    #hashed_password = bcrypt.hashpw(password.encode(), salt)
+    password = getpass.getpass('Enter Password: ')
     confirm_password = getpass.getpass("Confirm Password: ")
+    # strip of any spaces
+    password = password.strip()
+    confirm_password = confirm_password.strip()
+    email.strip()
 
-    if check_password(confirm_password.encode(), hashed_password):
+    try:
+        with open(USERS_FILE, 'r') as file:
+            existing_users = json.load(file)
+    except FileNotFoundError:
+        existing_users = {}
+
+    if email in existing_users:
+        print("A user is already registered with that email.")
+        return
+
+    if password == confirm_password:
     #if bcrypt.checkpw(confirm_password.encode(), hashed_password):
+        hashed_password = encrypt_password(password)
+        #hashed_password = bcrypt.hashpw(password.encode(), salt)
+        existing_users[email] = {
+            "username": username,
+            "password": hashed_password
+        }
         print("\nPasswords Matched.")
 
-        try:
-            with open(USERS_FILE, 'r') as file:
-                existing_users = json.load(file)
-        except FileNotFoundError:
-            existing_users = {}
-
-        existing_users[username] = hashed_password.decode()
-
-        with open(USERS_FILE, 'w') as file:
-            json.dump(existing_users, file, indent=4)
-        
+        save_user(existing_users)  
         print(f"User {username} Registered Successfully!")
+
+        menu_options()
     else:
         print("\nPasswords Do Not Match. Quitting.")
+        exit()
+
+def save_user(existing):
+    with open(USERS_FILE, 'w') as file:
+        json.dump(existing, file, indent=4)
+
+def load_users():
+    if os.path.exists('users.json'):
+        with open('users.json', 'r') as file:
+            return json.load(file)
+    return {}
 
 def user_login():
-    username = input("\nEnter Username: ")
+    email = input("\nEnter Email: ")
     password = getpass.getpass("Enter Password: ")
-    print("\nWELCOME TO SECUREDROP!")
-    menu = input("\nType 'H' for help, 'L' to list contacts, or press ENTER to continue: ")
-    
-    while menu:
-        if menu == 'H' or menu == 'h':
-            help()
-            break
-        elif menu == 'L' or menu == 'l':
-            #listContacts(user) need to get current user and pass to listContacts
-            print("Listing contacts:")
-            break
-        elif menu == '':
-            try:
-                with open(USERS_FILE, 'r') as file:
-                    existing_users = json.load(file)
-            except FileNotFoundError:
-                existing_users = {}
 
-            if username in existing_users and existing_users[username] == password:
-                print(f"User {username} Logged in Successfully!")
-            else:
-                print("\nInvalid Username or Password")
-            break
-        else:
-            print("Incorrect Entry. Quitting.")
-            break
+    try:
+        with open(USERS_FILE, 'r') as file:
+            existing_users = json.load(file)
+    except FileNotFoundError:
+        existing_users = {}
+    
+    if email in existing_users and check_password(existing_users[email]['password'], password):
+        print("\nWELCOME TO SECUREDROP!")
+        print(f"User {existing_users[email]['username']} Logged in Successfully!")
+    
+        menu_options()
+
+    else:
+        print("\nInvalid Email or Password")
