@@ -1,14 +1,16 @@
+"""
+COMP 2300 Fall 2024 Class Project Secure Drop
+User registration and log in file
+ @version: 1.1-2.26 - Milestone 1-2
+"""
+
 # to be fully implemented in the future
 def menu_options():
-    menu = input("\nType 'H' for help, 'L' to list contacts, or press ENTER to continue: ").lower()
+    menu = input("\nType 'help' For Commands: ").lower()
     
     while menu:
-        if menu == 'h':
+        if menu == 'help':
             help()
-            break
-        elif menu == 'l':
-            #listContacts(user) need to get current user and pass to listContacts
-            print("Listing contacts:")
             break
         elif menu == '':
             break
@@ -19,10 +21,10 @@ def menu_options():
 def help():
     print("\nHelp Menu:\n")
 
-    print("'A' -> Add a new contact")
-    print("'C' -> List all online contacts")
-    print("'S' -> Transfer file to contact")
-    print("'E' -> Exit SecureDrop\n")
+    print("'ADD' -> Add a new contact")
+    print("'LIST' -> List all online contacts")
+    print("'SEND' -> Transfer file to contact")
+    print("'EXIT' -> Exit SecureDrop\n")
 
     # user_selection = input("Enter One of the Options Above: ")
 

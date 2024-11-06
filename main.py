@@ -1,3 +1,9 @@
+"""
+COMP 2300 Fall 2024 Class Project Secure Drop
+User registration and log in file
+ @version: 1.1-2.26 - Milestone 1-2
+"""
+
 import os
 import json
 from user import register_user, user_login
@@ -34,7 +40,7 @@ if __name__ == "__main__":
             # return loaded JSON data
             data = json.load(file)
 
-            if not data == {}:
+            if data == {}:
                 print("\nNo users are registered with this client.")
                 login_or_register = input("\nDo you want to register a new user (y/n)? ").lower()
 
