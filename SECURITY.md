@@ -4,16 +4,17 @@
 
 versions are to be updated manually by the developers of this project
 
-version 1.0.0 - initial commit
+version 1.0.0.0 - initial commit
 
 To change versions:
 
-use the format x.y.z
+use the format x.y.k.z
 x = part 1 or 2 of the project
 y = milestore (part 1 = 1, 2 or 3, part 2 = 4, 5, or 6)
+k = step in the milestone (e.g.: milestone 1 step 2)
 z = commit number
 
-Example: @version: 1.2.23 means Part 1 of the Project, milestone 2, commit number 23 of milestone 2
+Example: @version: 1.2.3.23 means Part 1 of the Project, milestone 2, step 3, commit number 23 of milestone 2
 
 ## Reporting a Vulnerability
 
