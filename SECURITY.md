@@ -13,6 +13,8 @@ x = part 1 or 2 of the project
 y = milestore (part 1 = 1, 2 or 3, part 2 = 4, 5, or 6)
 z = commit number
 
+Example: @version: 1.2.23 means Part 1 of the Project, milestone 2, commit number 23 of milestone 2
+
 ## Reporting a Vulnerability
 
 Vulnerabilities should be reported by opening a new issue on the Issue tab in GitHub
