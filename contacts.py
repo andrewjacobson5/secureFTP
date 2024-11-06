@@ -1,7 +1,6 @@
 """
 COMP 2300 Fall 2024 Class Project Secure Drop
-User registration and log in file
- @version: 1.1-2.26 - Milestone 1-2
+Contacts generation
 """
 
 # Milestone 3 - Contacts:

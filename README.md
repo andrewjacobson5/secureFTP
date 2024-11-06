@@ -15,14 +15,23 @@ Patricia Antlitz
 
 ### To run the code:
 
-THe file that must be ran is main.py
-in the command line:
-`python main.py` or `python3 main.py` depending on your python version
+THe file that must be ran using `Makefile`
 
-This project uses the library `bcrypt`. The requirements.txt holds the dependecies that are required to run this code. You might need to run `python install -r requirements.txt` if you are unable to run the program due to a bcrypt error.
+First, you will need to generate SSL/TLS certificates for mutual authentication:
+
+**run:**\
+`./generate_certificates.sh` which contains all commands needed to generate the required certificates
+
+**then run:**\
+`make install` to install dependencies from requirements.txt
+
+**and:88\
+`make run` to run the program
+
+**To clean (removes certificates and cleans cache):**\
+`make clean`
 
 ---
-
 
 ## Objective:
 
@@ -34,6 +43,14 @@ This project aims to utilize cryptographic tools to implement a secure file tran
 ## Version 1:
 
 Project Milestone 1-3:
+
+@version: 1.0.0.1 - initial commit - Project part 1\
+@version: 1.1.2.5 - Milestone 1 basic user registration\
+@version: 1.1.4.14 - bcrypt
+@version: 1.1.5.1 - SSL/TLS certificates
+- space holder for future part 1 versions
+
+@version: 2.4.1.6 - files created for milestone 4
 
 **Milestone 1 - User Registration**
 

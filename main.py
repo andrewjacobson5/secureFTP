@@ -1,12 +1,14 @@
 """
 COMP 2300 Fall 2024 Class Project Secure Drop
-User registration and log in file
- @version: 1.1-2.26 - Milestone 1-2
+MAIN
 """
 
 import os
 import json
+import threading
 from user import register_user, user_login
+from mutual_cert import start_server, start_client
+
 users = {}
 
 USERS_FILE = 'users.json'  
@@ -29,6 +31,8 @@ def user_exist(login_or_register):
 
 if __name__ == "__main__":
     login_or_register = ''
+    server_thread = threading.Thread(target=start_server, daemon=True)
+    server_thread.start()
 
     if not os.path.exists(USERS_FILE):
         with open(USERS_FILE, 'w') as file:
@@ -59,3 +63,5 @@ if __name__ == "__main__":
                 login_or_register = input("\nEnter 'L' to login, or 'R' to register a new user: ").lower()
                 user_exist(login_or_register)
                 break
+
+    start_client()
