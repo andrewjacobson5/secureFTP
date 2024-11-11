@@ -19,9 +19,9 @@ generate_certificates:
 
 # Run application
 run:
-	$(PYTHON) main.py
+	$(PYTHON) src/main.py
 
 # Clean up generated certificates and other files
 clean:
-	rm -f *.pem *.csr *.srl
-	rm -rf __pycache__
+	rm -rf certs
+	rm -rf src/__pycache__

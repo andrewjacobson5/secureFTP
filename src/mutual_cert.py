@@ -13,8 +13,8 @@ SERVER_ADDRESS = ('localhost', 8443)
 def start_server():
     context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     context.verify_mode = ssl.CERT_REQUIRED
-    context.load_cert_chain(certfile='server_cert.pem', keyfile='server_key.pem')
-    context.load_verify_locations(cafile='ca_cert.pem')
+    context.load_cert_chain(certfile='certs/server_cert.pem', keyfile='certs/server_key.pem')
+    context.load_verify_locations(cafile='certs/ca_cert.pem')
 
     with socket.create_server(SERVER_ADDRESS) as server:
         with context.wrap_socket(server, server_side=True) as ssock:
@@ -27,8 +27,8 @@ def start_server():
 # client certificate funtion
 def start_client():
     context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-    context.load_cert_chain(certfile='client_cert.pem', keyfile='client_key.pem')
-    context.load_verify_locations(cafile='ca_cert.pem')
+    context.load_cert_chain(certfile='certs/client_cert.pem', keyfile='certs/client_key.pem')
+    context.load_verify_locations(cafile='certs/ca_cert.pem')
 
     with socket.create_connection(SERVER_ADDRESS) as sock:
         with context.wrap_socket(sock, server_hostname='localhost') as ssock:
