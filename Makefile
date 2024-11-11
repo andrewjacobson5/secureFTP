@@ -5,17 +5,17 @@ PYTHON = python3
 PIP = pip3
 
 # Targets
-.PHONY: all install generate-certificates run clean
-
-all: install generate-certificates run
+.PHONY: all install generate-certificates generate-windows-cert run clean
 
 # install dependencies
 install:
 	$(PIP) install -r requirements.txt
 
 # generate certificates
-generate_certificates:
+generate-certificates:
 	./generate_certificates.sh
+generate-windows-cert:
+	./generate_windows_cert
 
 # Run application
 run:
