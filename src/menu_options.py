@@ -3,13 +3,16 @@ COMP 2300 Fall 2024 Class Project Secure Drop
 Help Menu
 """
 
-# to be fully implemented in the future
-def menu_options():
-    menu = input("\nType 'help' For Commands: ").lower()
-    
-    while menu:
+import json
+from contacts import add_contact
+
+# to be fully implemented in the future - for Milestone 4
+def menu_options(user_email):    
+    while True:
+        menu = input("\nType 'help' For Commands: ").lower()
+
         if menu == 'help':
-            help()
+            help(user_email)
             break
         elif menu == '':
             break
@@ -17,14 +20,14 @@ def menu_options():
             print("Incorrect Entry. Quitting.")
             break
 
-def help():
+def help(user):
     print("\nHelp Menu:\n")
 
     print("'ADD' -> Add a new contact")
-    print("'LIST' -> List all online contacts")
-    print("'SEND' -> Transfer file to contact")
-    print("'EXIT' -> Exit SecureDrop\n")
+    # print("'LIST' -> List all online contacts")
+    # print("'SEND' -> Transfer file to contact")
+    # print("'EXIT' -> Exit SecureDrop\n")
 
-    # user_selection = input("Enter One of the Options Above: ")
-
-    # if user_selection == 'A' or user_selection == 'a' or user_selection "add":
+    user_selection = input("Enter One of the Options Above: ").lower()
+    if user_selection == 'a' or user_selection == "add":
+        add_contact(user)

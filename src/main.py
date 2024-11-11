@@ -6,12 +6,28 @@ MAIN
 import os
 import json
 import threading
+import sys
+import gc
 from user import register_user, user_login
 from mutual_cert import start_server, start_client
 
-users = {}
-
 USERS_FILE = 'users.json'  
+
+# function to clear any sensitive data when existing the program
+def secure_exit():
+    # enable debug information for garbage collection
+    # gc.set_debug(gc.DEBUG_LEAK)
+    # force garbage collection. Milestone 2-2
+    # print('Forcing Garbage Collection...')
+    gc.collect()
+    # print(f'\nGarbage Collection Completed. Unreachable Objects: {collected}')
+
+    # check if there are remaining objects:
+    if gc.garbage:
+        print('Unreachable Objects in Memory:')
+        for obj in gc.garbage:
+            print(f"Type: {type(obj)}, Object: {repr(obj)}")
+    sys.exit()
 
 def user_exist(login_or_register):
     
@@ -30,6 +46,7 @@ def user_exist(login_or_register):
 
 
 if __name__ == "__main__":
+    users = {}
     login_or_register = ''
     server_thread = threading.Thread(target=start_server, daemon=True)
     server_thread.start()
@@ -65,3 +82,4 @@ if __name__ == "__main__":
                 break
 
     start_client()
+    secure_exit()

@@ -26,13 +26,15 @@ if you are unable to run the bash file due to file restrictions, run:\
 `chmod 755 generate_certs.sh`
 
 **then run:**\
-`make install` to install dependencies from requirements.txt
+`make install` to install dependencies from requirements.txt IF needed
 
 **and:**\
 `make run` to run the program
 
 **To clean (removes certificates and cleans cache):**\
 `make clean`
+
+Avoid running `make` by itself
 
 ---
 
@@ -43,17 +45,23 @@ This project is designed to introduce you to essential cryptographic tools by bu
 This project aims to utilize cryptographic tools to implement a secure file transfer protocol.
 
 
-## Version 1:
+## Version 1 - Milestone 1:
 
 Project Milestone 1-3:
 
 @version: 1.0.0.1 - initial commit - Project part 1\
 @version: 1.1.2.5 - Milestone 1 basic user registration\
-@version: 1.1.4.14 - bcrypt\
-@version: 1.1.5.1 - SSL/TLS certificates
-- space holder for future part 1 versions
+@version: 1.1.4.14 - bcrypt - Hashing\
+@version: 1.1.5.1 - SSL/TLS certificates, RSA
+
+
+## Version 2 - Milestone 2
 
 @version: 2.4.1.6 - files created for milestone 4
+
+--- 
+
+### Specs:
 
 **Milestone 1 - User Registration**
 
@@ -81,9 +89,38 @@ This module is straightforward and should be relatively quick to implement. Key 
 
 ---
 
+# Data Security Layers:
+
+1. **bcrypt for Password Hashing (Not Encryption/Decryption)**
+
+bcrypt is a hashing algorithm. It is used to securely hash passwords for storage, which is a one-way process.\
+Hashing with bcrypt ensures that even if someone gains access to our stored data (such as our JSON file), they cannot easily retrieve the original password, because hashes are irreversible.\
+When a user registers, the password is hashed with bcrypt and then stored in the JSON file. During login, the entered password is hashed again and compared with the stored hash to verify the password.
+
+Important Note: bcrypt does not encrypt or decrypt passwords. Instead, it’s used to securely store a hashed version of the password, protecting it from offline password-cracking attacks.
+
+2. **SSL/TLS for Secure Transmission**
+
+SSL/TLS provides a secure communication channel between the client and server by encrypting data during transmission. This prevents third parties from intercepting sensitive information, like passwords, as they travel over the network.\
+Our code uses SSL/TLS to establish a mutual authentication connection with certificates on both the client and server sides. This ensures that both parties are verified and that all transmitted data is encrypted during transit.\
+Data is decrypted only on the receiving end, so it remains encrypted while traveling between the client and server.
+
+3. **Additional RSA Encryption for Password Transmission**
+
+An extra layer of security was added: RSA encryption for the password on the client side using the server's public key before transmission.\
+RSA encrypts the password on the client side (using the server’s public key), which is then transmitted over the already secure TLS connection.\
+On the server side, the password is decrypted with the server’s private key to get back the original plaintext password, which is then passed through bcrypt for verification against the stored hash.
+
+
+---
+
 ### Technologies Used:
 Python\
 GitHub\
 Git\
 Json\
+Hashing by bcryot\
+SSL\
+TLS\
+RSA
 

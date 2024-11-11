@@ -1,8 +1,5 @@
-from encrypt import encrypt_password, check_password
-from user import user_login
-import json
-import getpass
-import threading
+from user import user_login, load_users
+from encrypt import check_password
 import ssl
 import socket
 
@@ -18,7 +15,7 @@ def start_server():
 
     with socket.create_server(SERVER_ADDRESS) as server:
         with context.wrap_socket(server, server_side=True) as ssock:
-            print('Server started with mutual TLS')
+            print('\nServer started with mutual TLS')
             while True:
                 conn, addr = ssock.accept()
                 print(f'Connection from {addr} established and client authenticated!')
@@ -32,12 +29,16 @@ def start_client():
 
     with socket.create_connection(SERVER_ADDRESS) as sock:
         with context.wrap_socket(sock, server_hostname='localhost') as ssock:
-            print('Connected to server with mutual TLS')
+            print('Mutual TLS server')
             ssock.sendall(b'Secure Server')
 
 def handle_client(conn):
 # handle client interactions on server side
     try:
-        user_login()
+        if user_login():
+            print("Client successfully logged in.")
+        else:
+            print("Client failed to log in.")
     finally:
         conn.close()
+        conn = None

@@ -3,39 +3,18 @@ COMP 2300 Fall 2024 Class Project Secure Drop
 User registration and log in file
 """
 
-import os
-import json
 import getpass
 from menu_options import menu_options
-from contacts import listContacts
+from utils import load_users, save_user
 from encrypt import encrypt_password, check_password
 
-USERS_FILE = 'users.json' 
-
-full_name = ''
-password = ''
-email = ''
-
 def register_user():
-    # I have commented full name and address out for now, but according to the instructions,
-    # we should include these. Commented out for now to make it easier for us to test - PA
-    # fullname = input("Enter Full Name: ")
-    # email = input("Enter Email Address: ")
-    full_name = input('\nEnter Full Name: ')
+    full_name = input('\nEnter Full Name: ').upper()
     email = input('Enter Email Address: ').lower()
-    # getpass wil hide the password for security purposes
     password = getpass.getpass('Enter Password: ')
     confirm_password = getpass.getpass("Re-Enter Password: ")
-    # strip of any spaces
-    password = password.strip()
-    confirm_password = confirm_password.strip()
-    email.strip()
 
-    try:
-        with open(USERS_FILE, 'r') as file:
-            existing_users = json.load(file)
-    except FileNotFoundError:
-        existing_users = {}
+    existing_users = load_users()
 
     if email in existing_users:
         print("A user is already registered with that email.")
@@ -46,10 +25,15 @@ def register_user():
         hashed_password = encrypt_password(password)
         #hashed_password = bcrypt.hashpw(password.encode(), salt)
         existing_users[email] = {
+            'email': email,
             "full_name": full_name,
-            "password": hashed_password
+            "password": hashed_password,
+            'contacts': []
         }
         print("\nPasswords Matched.")
+        
+        del password
+        del confirm_password
 
         save_user(existing_users)  
         print(f"User {full_name} Registered Successfully!\n")
@@ -60,35 +44,30 @@ def register_user():
         exit()
     else:
         print("\nPasswords Do Not Match. Quitting.")
+        del password
+        del confirm_password
         exit()
 
-def save_user(existing):
-    with open(USERS_FILE, 'w') as file:
-        json.dump(existing, file, indent=4)
-
-def load_users():
-    if os.path.exists('users.json'):
-        with open('users.json', 'r') as file:
-            return json.load(file)
-    return {}
-
 def user_login():
-    try:
-        with open(USERS_FILE, 'r') as file:
-            existing_users = json.load(file)
-    except FileNotFoundError:
-        existing_users = {}
+    existing_users = load_users()
 
-    while True:
+    for i in range(3):
         email = input("\nEnter Email Address: ")
-        password = getpass.getpass("Enter Password: ")
+        login_password = getpass.getpass("Enter Password: ")
 
-        if email in existing_users and check_password(existing_users[email]['password'], password):
-            print("\nWELCOME TO SECUREDROP!")
-            print(f"User {existing_users[email]['full_name']} Logged in Successfully!")
-            # call menu from file menu_options.py
-            menu_options()
-            break
+        if email in existing_users:
+            # password is not being stored on a variable to avoid leaking
+            if check_password(existing_users[email]['password'], login_password):
+                print("\nWELCOME TO SECUREDROP!")
+                print(f"User {existing_users[email]['full_name']} Logged in Successfully!")
+                # call menu from file menu_options.py
+                # menu options to be added in Milestone 4. Uncomment this:
+                menu_options(email)
+                return True
+            else:
+                print("\nEmail and Password Combination Invalid.\n")
         else:
             print("\nEmail and Password Combination Invalid.\n")
             continue
+
+        del login_password
