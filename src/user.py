@@ -25,7 +25,6 @@ def register_user():
         hashed_password = encrypt_password(password)
         #hashed_password = bcrypt.hashpw(password.encode(), salt)
         existing_users[email] = {
-            'email': email,
             "full_name": full_name,
             "password": hashed_password,
             'contacts': []

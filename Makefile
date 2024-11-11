@@ -5,7 +5,7 @@ PYTHON = python3
 PIP = pip3
 
 # Targets
-.PHONY: all install generate-certificates run clean
+.PHONY: all install generate_certificates generate_windows_cert run clean
 
 all: install generate-certificates run
 
@@ -16,6 +16,8 @@ install:
 # generate certificates
 generate_certificates:
 	./generate_certificates.sh
+generate_windows_cert:
+	./generate_windows_cert
 
 # Run application
 run:

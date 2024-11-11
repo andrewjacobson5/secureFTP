@@ -60,5 +60,28 @@
             "Luna Tuna",
             "JDJiJDEyJDdYUm5SV1JvUWhYS3NDWUdNQS9DMnVobW4zUlo3TTgvV3dRa2xDMG12dldLcC52UmZKMUIy"
         ]
+    },
+    "p@test.com": {
+        "full_name": "PAT'S NEW USER TEST",
+        "password": "JDJiJDEyJFhuUzNhcWwuQWZaN0trWmVKZUluTmVLbWVvREJFcEZCUy5vTy9BRENITVUwU3ZLNzd3SGVl",
+        "contacts": [
+            {
+                "contact_name": "Luna Test",
+                "contact_email": "lu@lu.com"
+            },
+            {
+                "contact_name": "Tofu",
+                "contact_email": "tofu@e.com"
+            },
+            {
+                "contact_name": "final contact for now",
+                "contact_email": "f@fn.com"
+            }
+        ]
+    },
+    "final@test.com": {
+        "full_name": "FINAL TEST",
+        "password": "JDJiJDEyJHRxTm9NcTNndVZZUVNPRVAwenZqUC5KSk9yQjViWVZILnRsZTZyVDV1TXpuT2VpNW1PaHND",
+        "contacts": []
     }
 }

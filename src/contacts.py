@@ -24,12 +24,15 @@ def add_contact(user_email):
     if 'contacts' not in users[user_email]:
         users[user_email]['contacts'] = []
 
+    contact_entry = {
+        "contact_name": contact_name,
+        "contact_email": contact_email
+    }
 
-    users[user_email]['contacts', 'contact_name'].append(contact_name)
-    users[user_email]['contacts', 'contact_email'].append(contact_email)
+    users[user_email]['contacts'].append(contact_entry)
 
     save_user(users)
-    print("New Contact {contact_email} added to {user_email}'s contact list\n")
+    print(f"New Contact: {contact_name} with email {contact_email} was added to {user_email}'s contact list\n")
 
 # Milestone 4:
 # def list_contacts(user_email):
