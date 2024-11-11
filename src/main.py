@@ -16,12 +16,7 @@ USERS_FILE = 'users.json'
 # function to clear any sensitive data when existing the program
 def secure_exit():
     # enable debug information for garbage collection
-    # gc.set_debug(gc.DEBUG_LEAK)
-    # force garbage collection. Milestone 2-2
-    # print('Forcing Garbage Collection...')
     gc.collect()
-    # print(f'\nGarbage Collection Completed. Unreachable Objects: {collected}')
-
     # check if there are remaining objects:
     if gc.garbage:
         print('Unreachable Objects in Memory:')

@@ -76,6 +76,10 @@
             {
                 "contact_name": "final contact for now",
                 "contact_email": "f@fn.com"
+            },
+            {
+                "contact_name": "User Refactor",
+                "contact_email": "after@refactoring.test"
             }
         ]
     },
@@ -83,5 +87,15 @@
         "full_name": "FINAL TEST",
         "password": "JDJiJDEyJHRxTm9NcTNndVZZUVNPRVAwenZqUC5KSk9yQjViWVZILnRsZTZyVDV1TXpuT2VpNW1PaHND",
         "contacts": []
+    },
+    "file@refactor.test": {
+        "full_name": "NEW USER AFTER REFACTORING",
+        "password": "JDJiJDEyJERmUU94dkdEMUNIZXNQMER2VFhybGVUbnZQcVpIajM3UnB0b2ovb0xxV1paTzgwc2Uyblhp",
+        "contacts": [
+            {
+                "contact_name": "User test",
+                "contact_email": "success@wegotthis"
+            }
+        ]
     }
 }
