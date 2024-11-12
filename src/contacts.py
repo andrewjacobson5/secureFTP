@@ -29,6 +29,8 @@ def add_contact(user_email):
     for contact in users[user_email]["contacts"]:
         if contact["contact_email"] == contact_email:
             contact["contact_name"] = contact_name
+
+            print(f"Existing Contact UPDATED to {contact_name} for email address: {contact_email}\n")
             contact_exists = True
             break
 
