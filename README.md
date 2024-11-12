@@ -7,8 +7,8 @@
 
 ### Authors:
 Patricia Antlitz\
-Andrew Jacobson
-Flower Letourneau
+Andrew Jacobson\
+Flower Letourneau\
 Paul Warwick
 
 ---
