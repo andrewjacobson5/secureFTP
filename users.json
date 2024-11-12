@@ -66,7 +66,7 @@
         "password": "JDJiJDEyJFhuUzNhcWwuQWZaN0trWmVKZUluTmVLbWVvREJFcEZCUy5vTy9BRENITVUwU3ZLNzd3SGVl",
         "contacts": [
             {
-                "contact_name": "Luna Test",
+                "contact_name": "Samanthat",
                 "contact_email": "lu@lu.com"
             },
             {
@@ -80,6 +80,10 @@
             {
                 "contact_name": "User Refactor",
                 "contact_email": "after@refactoring.test"
+            },
+            {
+                "contact_name": "Luna Test",
+                "contact_email": "lu@lu.com"
             }
         ]
     },
