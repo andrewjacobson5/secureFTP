@@ -46,8 +46,30 @@ NOTE: I do not have a windows machine so I was NOT abke to test this script. In 
 **if you are unable to run the bash file due to file restrictions, run:**
 `chmod 755 generate_certs.sh`
 
+---
+
+### Virtual Environment:
+
+In order to run bcrypt, you might need to set up a virtual environment:
+
+Unix/Linux:
+
+`python3 -m venv venv`
+
+`source venv/bin/activate`
+
+Windows:
+
+`python3 -m venv venv`
+
+`.\venv\Scripts\activate`
+
+**DEACTIVATE:** `deactivate` once you are done
+
 **then run:**\
 `make install` to install dependencies from requirements.txt IF needed
+
+---
 
 ### Run the program:
 
