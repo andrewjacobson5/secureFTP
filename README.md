@@ -6,10 +6,10 @@
  Professor: Sashank Narain - Computer Science Department/Cybersecurity
 
 ### Authors:
-Patricia Antlitz
-Andrew Jacobson  
-Flower Letourneau  
-Paul Warwick
+Patricia Antlitz\
+Andrew Jacobson\  
+Flower Letourneau\  
+Paul Warwick\
 
 ---
 
