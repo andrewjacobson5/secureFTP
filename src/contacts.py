@@ -23,16 +23,26 @@ def add_contact(user_email):
     
     if 'contacts' not in users[user_email]:
         users[user_email]['contacts'] = []
+    
+    # check if the contact exists
+    contact_exists = False
+    for contact in users[user_email]["contacts"]:
+        if contact["contact_email"] == contact_email:
+            contact["contact_name"] = contact_name
+            contact_exists = True
+            break
 
-    contact_entry = {
-        "contact_name": contact_name,
-        "contact_email": contact_email
-    }
+    # if the contact does not exist
+    if not contact_exists:
+        contact_entry = {
+            "contact_name": contact_name,
+            "contact_email": contact_email
+        }
 
-    users[user_email]['contacts'].append(contact_entry)
+        users[user_email]['contacts'].append(contact_entry)
+        print(f"New Contact: {contact_name} with email {contact_email} was added to {user_email}'s contact list\n")
 
     save_user(users)
-    print(f"New Contact: {contact_name} with email {contact_email} was added to {user_email}'s contact list\n")
 
 # Milestone 4:
 # def list_contacts(user_email):
