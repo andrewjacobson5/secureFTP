@@ -13,7 +13,7 @@ Paul Warwick
 
 ---
 
-## ATENTION:
+## ATTENTION:
 
 ### To run the code:
 
@@ -59,7 +59,7 @@ NOTE: I do not have a windows machine so I was NOT abke to test this script. In 
 
 Always use make clean to delete your local certificates
 
-## ATENTION:
+## ATTENTION:
 
 ### Avoid running `make` by itself
 
