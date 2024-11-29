@@ -13,8 +13,10 @@ openssl genpkey -algorithm RSA -out certs/server_key.pem
 # Generate server certificate signing request with SAN for localhost
 openssl req -new -key certs/server_key.pem -out certs/server.csr -subj "/C=US/ST=State/L=City/O=Organization/OU=OrgUnit/CN=localhost"
 
-# Create a config file for SAN
-echo "subjectAltName=DNS:localhost" > san.cnf
+# Create a config file for SAN # Upadate 11/29 added IP for localhost testing. 
+cat << EOF > san.cnf
+subjectAltName=DNS:localhost,IP:127.0.0.1
+EOF
 
 # Sign the server CSR with the CA, adding the SAN config
 openssl x509 -req -in certs/server.csr -CA certs/ca_cert.pem -CAkey certs/ca_key.pem -CAcreateserial -out certs/server_cert.pem -days 365 -extfile san.cnf
