@@ -8,7 +8,9 @@ Contacts generation
     # Encrypt the contacts for each person
     # Adding/Removing contacts  
 
+from utils import load_users
 from utils import load_users, save_user
+from presence_server import check_online_status
 
 def add_contact(user_email):
     contact_name = input("Enter Contact's Full Name: ")
@@ -46,14 +48,33 @@ def add_contact(user_email):
 
     save_user(users)
 
-# Milestone 4:
-# def list_contacts(user_email):
-#     users = load_users()
+def list_contacts(user_email):
+    users = load_users()
 
-#     # retrieve and display the user's contact is they exist
-#     if user_email in users and 'contacts' in users[user_email]:
-#         print(f"{user_email}'s contacts: ")
-#         for encrypted_contact in users[user_email]['contacts']:
-#             print(f"- {encrypted_contact}") # display encrypted contact
-#     else:
-#         print(f"No contacts found for {user_email}.")
+    if user_email not in users or 'contacts' not in users[user_email]:
+        print(f"No contacts found for {user_email}.")
+        return
+
+    user_contacts = users[user_email]['contacts']
+    print(f"{user_email}'s contacts:")
+
+    for contact in user_contacts:
+        contact_email = contact["contact_email"]
+        contact_name = contact["contact_name"]
+        reciprocated = False
+
+        # Check if reciprocity exists
+        if contact_email in users:
+            contact_contacts = users[contact_email].get("contacts", [])
+            reciprocated = any(c["contact_email"] == user_email for c in contact_contacts)
+
+        # Check online status
+        online = check_online_status(contact_email)
+
+        # Display based on conditions
+        if reciprocated and online:
+            print(f"- {contact_name} ({contact_email}) [CONTACT RECIPROCATED & ONLINE]")
+        elif reciprocated:
+            print(f"- {contact_name} ({contact_email}) [CONTACT RECIPROCATED & OFFLINE]")
+        else:
+            print(f"- {contact_name} ({contact_email}) [CONTACT NOT RECIPROCATED]")

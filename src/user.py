@@ -60,7 +60,6 @@ def user_login():
                 print("\nWELCOME TO SECUREDROP!")
                 print(f"User {existing_users[email]['full_name']} Logged in Successfully!")
                 # call menu from file menu_options.py
-                # menu options to be added in Milestone 4. Uncomment this:
                 menu_options(email)
                 return True
             else:

@@ -125,13 +125,13 @@ user.py = user registration, and log in
 
 encrypt.py = password hashing for encryption using bcrypt
 
-menu_options = help options when the user successfully logsin - ADD fuctionality for now
+menu_options = help options when the user successfully logs in - ADD fuctionality for now
 
 contacts.py = adds a new contact to the current user logged in
 
 mutual_cert.py = SSL certificates for login, sign up security
 
-main.py = main fole, runs the code, garbage collection
+main.py = main file, runs the code, garbage collection
 
 Makefile = must be used to run this program
 
@@ -170,6 +170,22 @@ This module is straightforward and should be relatively quick to implement. Key 
 1. A database isn’t necessary; using files, YAML, or JSON will suffice. Assume each user has a small number of contacts.
 2. Utilize information generated in Milestone 2 to ensure that contact information remains confidential and intact. Protect against unauthorized access or tampering by malicious users.
 
+**Milestone 4 - Listing Contacts**
+
+This module allows the program to list a users contacts.
+
+File updates:
+
+menu_options = help options when the user successfully logsin - ADD, LIST, EXIT functions are usable.
+
+contacts.py = adds a new contact to the current user logged in, can list them too.
+
+mutual_cert.py = SSL certificates for login, sign up security.
+
+main.py = main file, runs the code, garbage collection
+
+presence_server.py = keeps track of users that are online.
+
 ---
 
 # Data Security Layers:
@@ -202,7 +218,7 @@ Python\
 GitHub\
 Git\
 Json\
-Hashing by bcryot\
+Hashing by bcrypt\
 SSL\
 TLS\
 RSA
