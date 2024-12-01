@@ -20,7 +20,7 @@ def start_presence_server():
             server_socket.bind((PRESENCE_HOST, PRESENCE_PORT))  # changed so the socket binds to the predefined port. 
             port = server_socket.getsockname()[1]
             print(f"Presence server started on port {port}")
-            while running:
+            while True:
                 data, addr = server_socket.recvfrom(1024)
                 if not running:
                     break

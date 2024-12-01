@@ -11,13 +11,9 @@ import gc
 from user import register_user, user_login
 from mutual_cert import start_server, start_client
 from presence_server import start_presence_server
-
 USERS_FILE = 'users.json'  
-running = True
 # function to clear any sensitive data when existing the program
 def secure_exit():
-    global running
-    running = False
     # enable debug information for garbage collection
     gc.collect()
     # check if there are remaining objects:
