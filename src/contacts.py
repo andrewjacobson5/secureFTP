@@ -8,13 +8,12 @@ Contacts generation
     # Encrypt the contacts for each person
     # Adding/Removing contacts  
 
-from utils import load_users
 from utils import load_users, save_user
 from presence_server import check_online_status
 
 def add_contact(user_email):
-    contact_name = input("Enter Contact's Full Name: ")
-    contact_email = input("Enter Contact's Email: ")
+    contact_name = input("Enter Contact's Full Name: ").strip()
+    contact_email = input("Enter Contact's Email: ").strip()
 
     users = load_users()
 
