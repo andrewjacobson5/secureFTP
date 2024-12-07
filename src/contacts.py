@@ -9,7 +9,7 @@ Contacts generation
     # Adding/Removing contacts  
 
 from utils import load_users, save_user
-from presence_server import check_online_status
+from tls_client import check_online_status
 
 def add_contact(user_email):
     contact_name = input("Enter Contact's Full Name: ").strip()
@@ -47,7 +47,10 @@ def add_contact(user_email):
 
     save_user(users)
 
+
 def list_contacts(user_email):
+    from menu_options import menu_options
+
     users = load_users()
 
     if user_email not in users or 'contacts' not in users[user_email]:
@@ -70,10 +73,8 @@ def list_contacts(user_email):
         # Check online status
         online = check_online_status(contact_email)
 
-        # Display based on conditions
+        # Display based on conditions online and reciprocated
         if reciprocated and online:
-            print(f"- {contact_name} ({contact_email}) [CONTACT RECIPROCATED & ONLINE]")
-        elif reciprocated:
-            print(f"- {contact_name} ({contact_email}) [CONTACT RECIPROCATED & OFFLINE]")
-        else:
-            print(f"- {contact_name} ({contact_email}) [CONTACT NOT RECIPROCATED]")
+            print(f"- {contact_name} ({contact_email})")
+
+

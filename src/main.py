@@ -5,12 +5,9 @@ MAIN
 
 import os
 import json
-import threading
 import sys
 import gc
 from user import register_user, user_login
-from mutual_cert import start_server, start_client
-from presence_server import start_presence_server
 USERS_FILE = 'users.json'  
 # function to clear any sensitive data when existing the program
 def secure_exit():
@@ -40,18 +37,6 @@ def user_exist(login_or_register):
 
 
 if __name__ == "__main__":
-    import threading
-
-    # Start the presence server
-    print("Starting the presence server...")
-    presence_thread = threading.Thread(target=start_presence_server, daemon=True)
-    presence_thread.start()
-
-    # Start the mutual TLS server
-    print("Starting the mutual TLS server...")
-    tls_server_thread = threading.Thread(target=start_server, daemon=True)
-    tls_server_thread.start()
-
     # Initialize user data
     if not os.path.exists(USERS_FILE):
         with open(USERS_FILE, 'w') as file:
@@ -75,14 +60,15 @@ if __name__ == "__main__":
                     print("\nInvalid choice, please try again.")
                     continue
             else:
-                print("\nA User Exists in This Machine.")
-                login_or_register = input("\nEnter 'L' to login, or 'R' to register a new user: ").lower()
-                user_exist(login_or_register)
-                break
+                while True:
+                    print("\nA User Exists in This Machine.")
+                    login_or_register = input("\nEnter 'L' to login, 'R' to register a new user, 'E' to exit: ").lower()
+                    
+                    if (login_or_register == 'e'):
+                        break
 
-    # Start the client
-    print("Starting the client...")
-    start_client()
+                    user_exist(login_or_register)
+                break
 
     # Secure exit
     print("Shutting down the application...")

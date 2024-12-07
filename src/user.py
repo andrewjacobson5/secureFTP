@@ -4,9 +4,12 @@ User registration and log in file
 """
 
 import getpass
+import threading
 from menu_options import menu_options
 from utils import load_users, save_user
 from encrypt import encrypt_password, check_password
+from tls_client import send_heartbeat
+from tls_client import check_online_status
 
 def register_user():
     full_name = input('\nEnter Full Name: ').upper()
@@ -51,7 +54,13 @@ def user_login():
     existing_users = load_users()
 
     for i in range(3):
+
+        # logging in an offline user
         email = input("\nEnter Email Address: ")
+        while check_online_status(email):
+            print("User is already online!")
+            return
+        
         login_password = getpass.getpass("Enter Password: ")
 
         if email in existing_users:
@@ -59,6 +68,10 @@ def user_login():
             if check_password(existing_users[email]['password'], login_password):
                 print("\nWELCOME TO SECUREDROP!")
                 print(f"User {existing_users[email]['full_name']} Logged in Successfully!")
+
+                # start sending heartbeats to server for presence checking
+                threading.Thread(target=send_heartbeat, args=(email,), daemon=True).start()
+
                 # call menu from file menu_options.py
                 menu_options(email)
                 return True

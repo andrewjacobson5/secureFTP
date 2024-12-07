@@ -73,6 +73,13 @@ Windows:
 
 ### Run the program:
 
+### Server start
+
+**run:**\
+`python3 src/tls_server.py` to run the tls server
+
+Then open a new terminal once server is up...
+
 **run:**\
 `make run` to run the program
 
