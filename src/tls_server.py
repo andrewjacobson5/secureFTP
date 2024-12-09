@@ -58,10 +58,11 @@ def start_tls_server():
 
         with socket.create_server((SERVER_HOST, TLS_PORT)) as server_socket:
             with context.wrap_socket(server_socket, server_side=True) as tls_socket:
-
+                print(f"\nServer running on {SERVER_HOST}:{TLS_PORT}")
                 while True:
                     conn, addr = tls_socket.accept()
                     threading.Thread(target=handle_tls_client, args=(conn, addr), daemon=True).start()
+        
     except Exception:
         print("Error starting TLS server")
         return

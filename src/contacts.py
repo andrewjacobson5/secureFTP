@@ -75,6 +75,7 @@ def list_contacts(user_email):
 
         # Display based on conditions online and reciprocated
         if reciprocated and online:
-            print(f"- {contact_name} ({contact_email})")
-
+            print(f"- {contact_name} ({contact_email}) [Online]")
+        else:
+            print(f"No contacts online")
 
