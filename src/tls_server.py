@@ -18,14 +18,45 @@ CLIENT_KEY = f'{CERTS_DIR}/client_key.pem'
 
 # Global dictionary to track online users and their last heartbeat timestamp
 online_users = {}
+# tracks which connection is which email
+connected_users = {}
 lock = threading.Lock()
 
 # --- SERVER FUNCTIONS ---
+def send_file(sender_sock, sender, receiver):
+    try:
+        receiver_sock = connected_users[reciever]
+        request = "SEND_REQUEST" + sender
+        receiver_sock.sendall(request.encode('utf-8'))
+        dataR = receiver_sock.recv(1024)
+        acpt = dataR.decode('utf-8').strip()
+        if acpt == "SEND_ACCEPT":
+            sender_sock.sendall(dataR)
+            while True:
+                dataS = sender_sock.recv(1024)
+                if not dataS:
+                    break
+                else:
+                    receiver_sock.sendall(dataS)
+            complete = dataR.decode('utf-8').strip()
+            if complete == "SEND_COMPLETE":
+                sender_sock.sendall(complete.encode('utf-8'))
+        else:
+            answer = "SEND_DENIED"
+            sender_sock.sendall(answer.encode('utf-8'))
+    except ConnectionResetError:
+        print(f"{sender} or {receiver} disconnected well sending file.\n")
+    except Exception as e:
+        print(f"Error sending file from {sender} to {reciever}.\n")
+
+
 
 def handle_tls_client(conn, addr):
     # Handle a single client connection.
+    print(f"Client connected {addr}")
     try:
         while True:
+            time.sleep(5)
             data = conn.recv(1024)
             if not data:
                 break
@@ -33,20 +64,37 @@ def handle_tls_client(conn, addr):
             # Decode the received data (user email as heartbeat)
             message = data.decode('utf-8').strip()
 
+            #if get SEND_USER check it for an email, if the email is not online, respond so, if online grab their address
+            #and send to their address a request from the sender to send a file.
+
             if message == "GET_USERS":
                 # Respond with the online users dictionary
                 with lock:
                     response = json.dumps(online_users)
                 conn.sendall(response.encode('utf-8'))
+            elif message[:8] == "SEND_USER":
+                if message[8:] in list(online_users.keys()):
+                    send_file(conn, client_email, message[8:])
+                else:
+                    response = "SEND_OFFLINE" + message[8:]
+                    conn.sendall(response.encode('utf-8'))
             else:
                 with lock:
-                    online_users[message] = time.time()  # Update the user's last heartbeat timestamp
-
+                    client_email = message
+                    online_users[client_email] = time.time()  # Update the user's last heartbeat timestamp
+                    connected_users[client_email] = conn #saves the conn for sending to specific clients
     except Exception as e:
         print(f"Error handling TLS client from {addr}: {e}")
     finally:
-        conn.close()
-
+        with lock:
+            print(f"Disconnecting {addr}")
+            tar = ""
+            for key in connected_users:
+                if connected_users[key] == conn:
+                    tar = key
+                    break
+            del connected_users[key]
+            conn.close()
 
 def start_tls_server():
     # Start the TLS server to handle secure client connections.
@@ -61,7 +109,7 @@ def start_tls_server():
                 print(f"\nServer running on {SERVER_HOST}:{TLS_PORT}")
                 while True:
                     conn, addr = tls_socket.accept()
-                    threading.Thread(target=handle_tls_client, args=(conn, addr), daemon=True).start()
+                    threading.Thread(target=handle_tls_client, args=(conn, addr, ), daemon=True).start()
         
     except Exception:
         print("Error starting TLS server")

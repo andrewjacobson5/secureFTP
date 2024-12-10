@@ -48,7 +48,7 @@ def add_contact(user_email):
     save_user(users)
 
 
-def list_contacts(user_email):
+def list_contacts(user_email, tls_sock):
     from menu_options import menu_options
 
     users = load_users()
@@ -71,7 +71,7 @@ def list_contacts(user_email):
             reciprocated = any(c["contact_email"] == user_email for c in contact_contacts)
 
         # Check online status
-        online = check_online_status(contact_email)
+        online = check_online_status(contact_email, tls_sock)
 
         # Display based on conditions online and reciprocated
         if reciprocated and online:

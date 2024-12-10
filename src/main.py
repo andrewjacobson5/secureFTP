@@ -8,6 +8,9 @@ import json
 import sys
 import gc
 from user import register_user, user_login
+
+
+
 USERS_FILE = 'users.json'  
 # function to clear any sensitive data when existing the program
 def secure_exit():

@@ -8,8 +8,8 @@ import threading
 from menu_options import menu_options
 from utils import load_users, save_user
 from encrypt import encrypt_password, check_password
-from tls_client import send_heartbeat
-from tls_client import check_online_status
+from tls_client import send_heartbeat, connect, check_online_status, listen_request
+
 
 def register_user():
     full_name = input('\nEnter Full Name: ').upper()
@@ -57,7 +57,8 @@ def user_login():
 
         # logging in an offline user
         email = input("\nEnter Email Address: ")
-        while check_online_status(email):
+        tls_sock, sock = connect()
+        while check_online_status(email, tls_sock):
             print("User is already online!")
             return
         
@@ -70,10 +71,11 @@ def user_login():
                 print(f"User {existing_users[email]['full_name']} Logged in Successfully!")
 
                 # start sending heartbeats to server for presence checking
-                threading.Thread(target=send_heartbeat, args=(email,), daemon=True).start()
+                threading.Thread(target=send_heartbeat, args=(email, tls_sock, ), daemon=True).start()
+                threading.Thread(target=listen_request, args=(tls_sock, ), daemon=True).start()
 
                 # call menu from file menu_options.py
-                menu_options(email)
+                menu_options(email, tls_sock, sock)
                 return True
             else:
                 print("\nEmail and Password Combination Invalid.\n")
