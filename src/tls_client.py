@@ -70,7 +70,7 @@ def listen_request(tls_sock):
         dataR = tls_sock.recv(4096)
         request = dataR.decode('utf-8')
         print(f"{request}")
-        #process_request(request)
+        process_request(request)
         time.sleep(5)
     except ConnectionResetError:
         print("Disconnected from server.\n")
@@ -111,26 +111,22 @@ def send_file(receiver, file_path, tls_sock):
         print(f"No file found.\n")
         return
     try:
-        tls_sock.sendall(b"SEND_USER" + reciever)  # Send the query command
+        tls_sock.sendall(b"SEND_USER" + receiver)  # Send the query command
         data = tls_sock.recv(4096)  # Receive the response
         message = data.decode('utf-8').strip()
         if message == "SEND_OFFLINE":
-            print(f"{reciever} is currently offline.\n")
+            print(f"{receiver} is currently offline.\n")
         if message == "SEND_DENIED":
-            print(f"{reciever} refused the file transfer.\n")
+            print(f"{receiver} refused the file transfer.\n")
         if message == "SEND_ACCEPT":
-            print(f"{reciever} has accepted the file transfer.\n")
+            print(f"{receiver} has accepted the file transfer.\n")
             file_name = file_path.split('/')[-1]
             tls_sock.sendall(file_name.encode('utf-8'))
             with open(file_path, 'rb') as file:
-                while True:
-                    data = file.read(1024)
-                    if not data:
-                        break
-                    else:
-                        tls_sock.sendall(data)
-                data = tls_sock.recv(1024)
-                message = data.decode('utf-8').strip()
+                while chunk := file.read(1024): # changed to chunk for efficiency
+                    tls_sock.sendall(chunk)
+            data = tls_sock.recv(1024)
+            message = data.decode('utf-8').strip()
             if message == "SEND_COMPLETE":
                 print(f"The file has been successful transferred.\n")
     except ConnectionResetError:

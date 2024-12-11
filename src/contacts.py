@@ -3,11 +3,6 @@ COMP 2300 Fall 2024 Class Project Secure Drop
 Contacts generation
 """
 
-# Contacts:
-    # Different contacts based on the user
-    # Encrypt the contacts for each person
-    # Adding/Removing contacts  
-
 from utils import load_users, save_user
 from tls_client import check_online_status
 
@@ -34,17 +29,14 @@ def add_contact(user_email):
             print(f"Existing Contact UPDATED to {contact_name} for email address: {contact_email}\n")
             contact_exists = True
             break
-
-    # if the contact does not exist
-    if not contact_exists:
-        contact_entry = {
-            "contact_name": contact_name,
-            "contact_email": contact_email
-        }
-
-        users[user_email]['contacts'].append(contact_entry)
-        print(f"New Contact: {contact_name} with email {contact_email} was added to {user_email}'s contact list\n")
-
+        else: # if the contact does not exist
+            contact_entry = {
+                "contact_name": contact_name,
+                "contact_email": contact_email
+            }
+            users[user_email]['contacts'].append(contact_entry)
+            print(f"New Contact: {contact_name} with email {contact_email} was added to {user_email}'s contact list\n")
+    
     save_user(users)
 
 

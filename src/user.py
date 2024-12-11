@@ -53,14 +53,16 @@ def register_user():
 def user_login():
     existing_users = load_users()
 
-    for i in range(3):
+    for _ in range(3):
 
         # logging in an offline user
-        email = input("\nEnter Email Address: ")
+        email = input("\nEnter Email Address: ").strip().lower()
         tls_sock, sock = connect()
-        while check_online_status(email, tls_sock):
+
+        if check_online_status(email, tls_sock):
             print("User is already online!")
             return
+        
         
         login_password = getpass.getpass("Enter Password: ")
 

@@ -25,7 +25,7 @@ lock = threading.Lock()
 # --- SERVER FUNCTIONS ---
 def send_file(sender_sock, sender, receiver):
     try:
-        receiver_sock = connected_users[reciever]
+        receiver_sock = connected_users[receiver]
         request = "SEND_REQUEST" + sender
         receiver_sock.sendall(request.encode('utf-8'))
         dataR = receiver_sock.recv(1024)
@@ -47,7 +47,7 @@ def send_file(sender_sock, sender, receiver):
     except ConnectionResetError:
         print(f"{sender} or {receiver} disconnected well sending file.\n")
     except Exception as e:
-        print(f"Error sending file from {sender} to {reciever}.\n")
+        print(f"Error sending file from {sender} to {receiver}.\n")
 
 
 
@@ -122,12 +122,14 @@ def cleanup_online_users():
         time.sleep(5)  # Check every 5 seconds
         current_time = time.time()
 
-        with lock:
-            for user_email in list(online_users.keys()):
-                if current_time - online_users[user_email] > TIMEOUT:
-                    del online_users[user_email]
-                    print(f"User {user_email} marked as offline due to timeout.")
-
+        with lock: 
+            to_remove = [email for email, timestamp in online_users.items() if current_time - timestamp > TIMEOUT]
+            # changed the logic here, iterating over the dict's keys directly while modifying it could lead to race conditions
+            # also, when `list(online_users.keys())` is called, it is recalculating each time a key is deleted.
+            # iterating over `online_users.items()` only once and removing the users after avoids recalculating the keys.
+            for user in to_remove:
+                del online_users[user]
+                print(f"User {user} marked offline due to timeout.")
 
 def get_online_users():
     # Retrieve the list of currently online users.

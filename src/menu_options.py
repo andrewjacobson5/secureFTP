@@ -14,13 +14,12 @@ def menu_options(user_email, tls_sock, sock):
 def menu(user_email, tls_sock, sock):
     while(True):
         print("\nMenu:\n")
-
         print("'ADD' -> Add a new contact")
         print("'LIST' -> List all online contacts")
         print("'SEND' -> Transfer file to contact")
         print("'EXIT' -> Exit SecureDrop\n")
+        user_selection = input("Enter One of the Options Above: ").strip().lower()
 
-        user_selection = input("Enter One of the Options Above: ").lower()
         if user_selection in ['ADD', 'add', 'a']:
             add_contact(user_email)
         elif user_selection in ['LIST', 'list', 'l']:
