@@ -111,32 +111,42 @@ def send_file(receiver, file_path, tls_sock):
         print(f"No file found.\n")
         return
     try:
-        tls_sock.sendall(b"SEND_USER" + receiver)  # Send the query command
+        # tell the server about the recipient
+        tls_sock.sendall(f"SEND_USER:{receiver}\n".encode('utf-8'))  # Send the query command
+        # wait for server response
         data = tls_sock.recv(4096)  # Receive the response
         message = data.decode('utf-8').strip()
+        
         if message == "SEND_OFFLINE":
             print(f"{receiver} is currently offline.\n")
-        if message == "SEND_DENIED":
+        elif message == "SEND_DENIED":
             print(f"{receiver} refused the file transfer.\n")
-        if message == "SEND_ACCEPT":
+        elif message == "SEND_ACCEPT":
             print(f"{receiver} has accepted the file transfer.\n")
+            # send the file name and contents
             file_name = file_path.split('/')[-1]
             tls_sock.sendall(file_name.encode('utf-8'))
             with open(file_path, 'rb') as file:
                 while chunk := file.read(1024): # changed to chunk for efficiency
                     tls_sock.sendall(chunk)
+            
+            # tell the server that the file is fully sent
+            print("File sent. Awaiting confirmation.\n")
+            tls_sock.sendall(b"SEND_COMPLETE")
+            
+            # handle the server's confimation
             data = tls_sock.recv(1024)
             message = data.decode('utf-8').strip()
             if message == "SEND_COMPLETE":
                 print(f"The file has been successful transferred.\n")
+            else:
+                print(f"Error. Unexecpected response from server: {message}\n")   
+            
     except ConnectionResetError:
         print("Disconnected from server.\n")
-        #detects a disconnect, can then reconnect here if needed        
+        # detects a disconnect, can then reconnect here if needed        
     except Exception as e:
         print(f"Error sending file: {e}")
-        return {}
-
-    
 
 def check_online_status(email, tls_sock):
     if email in get_online_users(tls_sock):
