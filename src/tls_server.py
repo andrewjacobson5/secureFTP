@@ -55,6 +55,7 @@ def send_file(sender_sock, sender, receiver):
 
 def handle_tls_client(conn, addr):
     global connected_users
+    global online_users
     # Handle a single client connection over TLS. 
     print(f"Client connected {addr}")
     try:
@@ -97,10 +98,10 @@ def handle_tls_client(conn, addr):
     finally:
         with lock:
             print(f"Disconnecting client {addr}")
-            for key, connection in connected_users.items():
+            for key, connection in list(connected_users.items()):
                 if connection == conn:
                     print(f"Removing client {key}")
-                    del connected_users
+                    del connected_users[key]
                     del online_users[key]
                     break
         conn.close()

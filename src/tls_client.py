@@ -34,35 +34,43 @@ def connect():
 def process_request(request, tls_sock):
     #processes the send file request
     try:
-        with lock:
-            if request[:12] == "SEND_REQUEST":
-                acpt = input(f"{request[12:]} wants to send you a file. Accept (y/n)?").lower()
-                if acpt != "y":
-                    response = "SEND_DENIED"
-                    tls_sock.sendall(response.encode('utf-8'))
-                    return
-                response = "SEND_ACCEPT"
+        request = request.strip()
+        print(f"Processing request: {request}")
+        
+        if request.startswith("SEND_REQUEST"):
+            parts = request.split(":", 1)
+            if len(parts) < 2:
+                print("Invalid SEND_REQUEST format.\n")
+                return
+            
+            sender_email = parts[1].strip()
+            acpt = input(f"{sender_email} wants to send you a file. Accept? (y/n): ")
+            if acpt != "y":
+                response = "SEND_DENIED"
                 tls_sock.sendall(response.encode('utf-8'))
-                dataF = tls_sock.recv(4096)
-                file_name = dataF.decode('utf-8')
-                with open(file_name, 'wb') as file:
-                    while True:
-                        data = tls_sock.recv(1024)
-                        if not data:
-                            break
-                        else:
-                            file.write(data)
-                response = "SEND_COMPLETE"
-                tls_sock.sendall(response.encode('utf-8'))
-            else:
-                print(f"Request didn't read")
+                return
+            response = "SEND_ACCEPT"
+            tls_sock.sendall(response.encode('utf-8'))
+            
+            dataF = tls_sock.recv(4096)
+            file_name = dataF.decode('utf-8').strip()
+            with open(file_name, 'wb') as file:
+                while True:
+                    data = tls_sock.recv(1024)
+                    if not data:
+                        break
+                    file.write(data)
+            print(f"File received: {file_name}\n")
+            print("File transfer completed successfully.\n")
+            response = "SEND_COMPLETE"
+            tls_sock.sendall(response.encode('utf-8'))
+        else: 
+            print(f"Request didn't read: {request}")
     except ConnectionResetError:
         print("Disconnected from server.\n")
-        #detects a disconnect, can then reconnect here if needed
     except Exception as e:
-        # SERVER SHUTDOWN by one client disconnecting
-        print("Error processing request")
-    
+        print(f"Error processing request: {e}")
+                    
 
 
 def listen_request(tls_sock):
@@ -70,14 +78,14 @@ def listen_request(tls_sock):
         dataR = tls_sock.recv(4096)
         request = dataR.decode('utf-8')
         print(f"{request}")
-        process_request(request)
+        process_request(request, tls_sock)
         time.sleep(5)
     except ConnectionResetError:
         print("Disconnected from server.\n")
         #detects a disconnect, can then reconnect here if needed
     except Exception as e:
         # SERVER SHUTDOWN by one client disconnecting
-        print("Error listen for request")
+        print(f"Error listen for request: {e}")
 
 def send_heartbeat(user_email, tls_sock):
     #sends a heartbeat
