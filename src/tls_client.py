@@ -39,10 +39,10 @@ def process_request(request, tls_sock):
                 acpt = input(f"{request[12:]} wants to send you a file. Accept (y/n)?").lower()
                 if acpt != "y":
                     response = "SEND_DENIED"
-                    tls_client.tls_sock.sendall(response.encode('utf-8'))
+                    tls_sock.sendall(response.encode('utf-8'))
                     return
                 response = "SEND_ACCEPT"
-                tls_client.tls_sock.sendall(response.encode('utf-8'))
+                tls_sock.sendall(response.encode('utf-8'))
                 dataF = tls_sock.recv(4096)
                 file_name = dataF.decode('utf-8')
                 with open(file_name, 'wb') as file:
