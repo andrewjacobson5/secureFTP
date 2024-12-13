@@ -14,31 +14,27 @@ def add_contact(user_email):
 
     # ensure the user exists and initialize the contacts list
     if user_email not in users:
-        print(f'User {user_email} not found.')
+        print(f"User {user_email} not found.")
         return
     
-    if 'contacts' not in users[user_email]:
-        users[user_email]['contacts'] = []
+    if "contacts" not in users[user_email]:
+        users[user_email]["contacts"] = []
     
-    # check if the contact exists
-    contact_exists = False
+    # check if the contact already exists
     for contact in users[user_email]["contacts"]:
         if contact["contact_email"] == contact_email:
             contact["contact_name"] = contact_name
-
-            print(f"Existing Contact UPDATED to {contact_name} for email address: {contact_email}\n")
-            contact_exists = True
+            print(f"Existing contact UPDATED to {contact_name} for email address: {contact_email}\n")
             break
-        else: # if the contact does not exist
-            contact_entry = {
-                "contact_name": contact_name,
-                "contact_email": contact_email
-            }
-            users[user_email]['contacts'].append(contact_entry)
-            print(f"New Contact: {contact_name} with email {contact_email} was added to {user_email}'s contact list\n")
+    else:  # If no break occurred in the loop, add the new contact
+        contact_entry = {
+            "contact_name": contact_name,
+            "contact_email": contact_email
+        }
+        users[user_email]["contacts"].append(contact_entry)
+        print(f"New contact: {contact_name} with email {contact_email} was added to {user_email}'s contact list\n")
     
     safe_save(users)
-
 
 def list_contacts(user_email, tls_sock):
     from menu_options import menu_options
@@ -71,3 +67,23 @@ def list_contacts(user_email, tls_sock):
         else:
             print(f"No contacts online")
 
+def remove_contact(user_email):
+    contact_email = input("Enter the Email of the Contact to Remove: ").strip()
+
+    users = safe_load()
+
+    # make sure the user exists and has a contacts list
+    if user_email not in users or "contacts" not in users[user_email]:
+        print(f"No contacts found for {user_email}.")
+        return
+    
+    # Find and remove the contact
+    contacts = users[user_email]["contacts"]
+    updated_contacts = [contact for contact in contacts if contact["contact_email"] != contact_email]
+
+    if len(updated_contacts) == len(contacts):
+        print(f"No contact with email {contact_email} found.")
+    else:
+        users[user_email]["contacts"] = updated_contacts
+        safe_save(users)
+        print(f"Contact with email {contact_email} has been removed.")
