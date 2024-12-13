@@ -4,7 +4,6 @@ import time
 import json
 import os
 import threading
-import signal
 from queue import Queue
 
 # Configuration
@@ -68,8 +67,6 @@ def process_request(request, tls_sock):
                 return
 
             sender_email = parts[1].strip()
-            # Send a signal to interrupt input
-            os.kill(os.getpid(), signal.SIGINT)
             acpt = input(f"{sender_email} wants to send you a file. Accept? (y/n): ")
             response = "SEND_ACCEPT" if acpt.lower() == 'y' else "SEND_DENIED"
             tls_sock.sendall(response.encode('utf-8'))

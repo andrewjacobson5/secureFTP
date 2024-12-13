@@ -1,6 +1,5 @@
 import os
 import json
-import threading
 from keygen import encrypt_file, decrypt_file
 
 USERS_FILE = 'users.json'
