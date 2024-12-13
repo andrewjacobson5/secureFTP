@@ -1,6 +1,13 @@
 users.json
 .vscode
 
+# Encryption keys and certificates
+*.key
+*.pem
+*.crt
+*.cer
+*.csr
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
