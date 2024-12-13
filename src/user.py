@@ -8,7 +8,7 @@ import threading
 from menu_options import menu_options
 from utils import safe_load, safe_save
 from encrypt import encrypt_password, check_password
-from tls_client import send_heartbeat, connect, check_online_status, listen_request
+from tls_client import send_heartbeat, connect, check_online_status, listener_thread
 
 
 def register_user():
@@ -74,10 +74,11 @@ def user_login():
 
                 # start sending heartbeats to server for presence checking
                 threading.Thread(target=send_heartbeat, args=(email, tls_sock, ), daemon=True).start()
-                threading.Thread(target=listen_request, args=(tls_sock, ), daemon=True).start()
+                threading.Thread(target=listener_thread, args=(tls_sock, ), daemon=True).start()
 
                 # call menu from file menu_options.py
                 menu_options(email, tls_sock, sock)
+
                 return True
             else:
                 print("\nEmail and Password Combination Invalid.\n")
