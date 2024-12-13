@@ -7,17 +7,19 @@ USERS_FILE = 'users.json'
 def load_users():
     if os.path.exists(USERS_FILE):
         with open(USERS_FILE, 'r') as file:
-            return json.load(file)
+            try:
+                return json.load(file)  # Attempt to load JSON
+            except json.JSONDecodeError:
+                return {}  # Return an empty dictionary if file is invalid or empty
     return {}
 
+
 def safe_load():
-    # decrypt json
-    decrypt_file(USERS_FILE)
-    # get data
-    data = load_users()
-    # encrypt json
-    encrypt_file(USERS_FILE)
+    decrypt_file(USERS_FILE)  # Decrypt the file
+    data = load_users()  # Load users using the updated function
+    encrypt_file(USERS_FILE)  # Re-encrypt the file after loading
     return data
+
 
 def safe_save(users):
     # decrypt json

@@ -7,33 +7,32 @@ def write_key():
         key_file.write(key)
 
 def load_key():
-    # Loads the key from the current directory named `key.key`
+    # Loads the key from the key.key file
     return open("key.key", "rb").read()
 
 def encrypt_file(filename):
-    # if file is empty, leave it
-    with open(filename) as f:
+    with open(filename, "r") as f:  # Read file in text mode
         data = f.read()
 
     if not data or data == "{}":
         return
     
     key = load_key()
-
-    #this encrypts the data read from your json and stores it in 'encrypted'
     fernet = Fernet(key)
-    encrypted = fernet.encrypt(data)
 
-    #this writes your new, encrypted data into a new JSON file
-    with open(filename,'wb') as f:
+    # Encrypt and save as bytes
+    encrypted = fernet.encrypt(data.encode("utf-8"))
+
+    with open(filename, "wb") as f:  # Write in binary mode
         f.write(encrypted)
+
 
 def decrypt_file(filename):
     # if file is empty, leave it
-    with open(filename) as f:
+    with open(filename, "rb") as f:  # Read file in binary mode
         data = f.read()
 
-    if not data or data == "{}":
+    if not data or data == b"{}":  # Compare with bytes
         return
     
     key = load_key()
@@ -45,5 +44,5 @@ def decrypt_file(filename):
     decrypted_data = fernet.decrypt(data)
 
     # write the original file
-    with open(filename, "wb") as file:
-        file.write(decrypted_data)
+    with open(filename, "w") as file:  # Write in text mode
+        file.write(decrypted_data.decode("utf-8"))  # Decode bytes to string

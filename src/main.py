@@ -8,7 +8,8 @@ import json
 import sys
 import gc
 from user import register_user, user_login
-from keygen import write_key
+from keygen import write_key, encrypt_file
+from utils import safe_load
 
 USERS_FILE = 'users.json'  
 # function to clear any sensitive data when existing the program
@@ -42,36 +43,42 @@ if __name__ == "__main__":
     # Initialize user data
     if not os.path.exists(USERS_FILE):
         with open(USERS_FILE, 'w') as file:
-            json.dump({}, file, indent=4)  # Create empty user file if not exists
+            json.dump({}, file, indent=4)  # Create an empty JSON structure
+        encrypt_file(USERS_FILE)  # Encrypt the new file
         write_key()
 
+
     while True:
-        with open(USERS_FILE, 'r') as file:
-            data = json.load(file)
+        try:
+            with open(USERS_FILE, 'r') as file:
+                data = safe_load() # changed from json.load(file) to safe_load()
 
-            if not data:  # If no users exist
-                print("\nNo users are registered with this client.")
-                login_or_register = input("\nDo you want to register a new user (y/n)? ").lower()
+                if not data:  # If no users exist
+                    print("\nNo users are registered with this client.")
+                    login_or_register = input("\nDo you want to register a new user (y/n)? ").lower()
 
-                if login_or_register == 'y':
-                    user_exist('y')
-                    break
-                elif login_or_register == 'n':
-                    print("QUITTING")
-                    break
-                else:
-                    print("\nInvalid choice, please try again.")
-                    continue
-            else:
-                while True:
-                    print("\nA User Exists in This Machine.")
-                    login_or_register = input("\nEnter 'L' to login, 'R' to register a new user, 'E' to exit: ").lower()
-
-                    if (login_or_register == 'e'):
+                    if login_or_register == 'y':
+                        user_exist('y')
                         break
+                    elif login_or_register == 'n':
+                        print("QUITTING")
+                        break
+                    else:
+                        print("\nInvalid choice, please try again.")
+                        continue
+                else:
+                    while True:
+                        print("\nA User Exists in This Machine.")
+                        login_or_register = input("\nEnter 'L' to login, 'R' to register a new user, 'E' to exit: ").lower()
 
-                    user_exist(login_or_register)
-                break
+                        if (login_or_register == 'e'):
+                            break
+
+                        user_exist(login_or_register)
+                    break
+        except InterruptedError:
+            print("Error: Interrupted Error")
+            secure_exit()
 
     # Secure exit
     print("Shutting down the application...")
