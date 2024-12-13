@@ -8,8 +8,7 @@ import json
 import sys
 import gc
 from user import register_user, user_login
-
-
+from keygen import write_key
 
 USERS_FILE = 'users.json'  
 # function to clear any sensitive data when existing the program
@@ -26,7 +25,7 @@ def secure_exit():
 def user_exist(login_or_register):
     
     while login_or_register:
-        if login_or_register in ['r', 'y']:
+        if login_or_register in ['r', 'y']:# decrypt json
             register_user()
             break
         elif login_or_register == 'l':
@@ -44,6 +43,7 @@ if __name__ == "__main__":
     if not os.path.exists(USERS_FILE):
         with open(USERS_FILE, 'w') as file:
             json.dump({}, file, indent=4)  # Create empty user file if not exists
+        write_key()
 
     while True:
         with open(USERS_FILE, 'r') as file:
@@ -66,7 +66,7 @@ if __name__ == "__main__":
                 while True:
                     print("\nA User Exists in This Machine.")
                     login_or_register = input("\nEnter 'L' to login, 'R' to register a new user, 'E' to exit: ").lower()
-                    
+
                     if (login_or_register == 'e'):
                         break
 

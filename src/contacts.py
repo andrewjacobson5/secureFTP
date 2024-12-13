@@ -3,14 +3,14 @@ COMP 2300 Fall 2024 Class Project Secure Drop
 Contacts generation
 """
 
-from utils import load_users, save_user
+from utils import safe_load, safe_save
 from tls_client import check_online_status
 
 def add_contact(user_email):
     contact_name = input("Enter Contact's Full Name: ").strip()
     contact_email = input("Enter Contact's Email: ").strip()
 
-    users = load_users()
+    users = safe_load()
 
     # ensure the user exists and initialize the contacts list
     if user_email not in users:
@@ -37,13 +37,13 @@ def add_contact(user_email):
             users[user_email]['contacts'].append(contact_entry)
             print(f"New Contact: {contact_name} with email {contact_email} was added to {user_email}'s contact list\n")
     
-    save_user(users)
+    safe_save(users)
 
 
 def list_contacts(user_email, tls_sock):
     from menu_options import menu_options
 
-    users = load_users()
+    users = safe_load()
 
     if user_email not in users or 'contacts' not in users[user_email]:
         print(f"No contacts found for {user_email}.")

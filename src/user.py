@@ -6,7 +6,7 @@ User registration and log in file
 import getpass
 import threading
 from menu_options import menu_options
-from utils import load_users, save_user
+from utils import safe_load, safe_save
 from encrypt import encrypt_password, check_password
 from tls_client import send_heartbeat, connect, check_online_status, listen_request
 
@@ -17,7 +17,7 @@ def register_user():
     password = getpass.getpass('Enter Password: ')
     confirm_password = getpass.getpass("Re-Enter Password: ")
 
-    existing_users = load_users()
+    existing_users = safe_load()
 
     if email in existing_users:
         print("A user is already registered with that email.")
@@ -37,7 +37,7 @@ def register_user():
         del password
         del confirm_password
 
-        save_user(existing_users)  
+        safe_save(existing_users)  
         print(f"User {full_name} Registered Successfully!\n")
 
         # The user registration is a one-time process. Once a user is registered on a client, the
@@ -51,7 +51,7 @@ def register_user():
         exit()
 
 def user_login():
-    existing_users = load_users()
+    existing_users = safe_load()
 
     for _ in range(3):
 
