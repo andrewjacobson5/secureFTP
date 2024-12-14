@@ -4,7 +4,7 @@ Help Menu
 """
 
 from contacts import add_contact, list_contacts, remove_contact
-from send import send
+from tls_client import client_send_request
 
 
 def menu(user_email, tls_sock, sock):
@@ -22,15 +22,13 @@ def menu(user_email, tls_sock, sock):
         if user_selection in ['add', 'a']:
             add_contact(user_email)
         elif user_selection in ['list', 'l']:
-            list_contacts(user_email, tls_sock)
+            list_contacts(user_email)
         elif user_selection in ['send', 's']:
-            send(tls_sock)
+            client_send_request(tls_sock, user_email)
         elif user_selection in ['remove', 'r']:
             remove_contact(user_email)
         elif user_selection in ['exit', 'e']:
             print("Exiting SecureDrop.")
-            tls_sock.close()
-            sock.close()
             exit()
         else:
             print("Invalid selection.")

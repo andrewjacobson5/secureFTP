@@ -1,8 +1,10 @@
 import os
 import json
+import threading
 from keygen import encrypt_file, decrypt_file
 
 USERS_FILE = 'users.json'
+lock = threading.Lock()
 
 
 def load_users():
@@ -38,3 +40,45 @@ def save_user(users):
             json.dump(users, file, indent=4)
     else:
         return
+    
+# clear is_online for all users (when debugging code)
+def reset_user_state():
+    with lock:
+        users = safe_load()
+        for user in users:
+            users[user]["is_online"] = False
+            
+    safe_save(users)
+
+    
+    
+    
+def set_user_state(email, is_online):
+    """
+    Updates the user's online state in the user storage.
+    
+    :param email: The email of the user.
+    :param is_online: 1 for online, 0 for offline.
+    """
+    # Example: Update user state in a dictionary or JSON file
+    users = safe_load()
+    if email in users:
+        users[email]['is_online'] = is_online
+        safe_save(users)  # Save back to storage
+        print(f"Updated {email} to {'online' if is_online else 'offline'}.")
+    else:
+        print(f"User {email} not found.")
+
+        
+def check_user_state(username):
+    with lock:
+        users = safe_load()
+        # Find the user, return status
+        user_found = False
+        for user in users:
+            if user == username:
+                return users[user]["is_online"]
+
+        if not user_found:
+            print(f"User '{username}' not found in database.")
+            return

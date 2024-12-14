@@ -3,8 +3,7 @@ COMP 2300 Fall 2024 Class Project Secure Drop
 Contacts generation
 """
 
-from utils import safe_load, safe_save
-from tls_client import check_online_status
+from utils import safe_load, safe_save, check_user_state
 
 
 def add_contact(user_email):
@@ -40,11 +39,11 @@ def add_contact(user_email):
     safe_save(users)
 
 
-def list_contacts(user_email, tls_sock):
+def list_contacts(user_email):
 
     users = safe_load()
 
-    if user_email not in users or 'contacts' not in users[user_email]:
+    if not users[user_email] or not users[user_email]['contacts']:
         print(f"No contacts found for {user_email}.")
         return
 
@@ -63,7 +62,7 @@ def list_contacts(user_email, tls_sock):
                                user_email for c in contact_contacts)
 
         # Check online status
-        online = check_online_status(contact_email, tls_sock)
+        online = check_user_state(contact_email)
 
         # Display based on conditions online and reciprocated
         if reciprocated and online:

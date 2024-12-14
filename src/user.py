@@ -4,11 +4,10 @@ User registration and log in file
 """
 
 import getpass
-import threading
 from menu_options import menu
-from utils import safe_load, safe_save
+from utils import safe_load, safe_save, check_user_state
 from encrypt import encrypt_password, check_password
-from tls_client import send_heartbeat, connect, check_online_status, listener_thread
+from tls_client import connect
 
 
 def register_user():
@@ -30,7 +29,8 @@ def register_user():
         existing_users[email] = {
             "full_name": full_name,
             "password": hashed_password,
-            'contacts': []
+            'contacts': [],
+            "is_online": False
         }
         print("\nPasswords Matched.")
 
@@ -58,12 +58,12 @@ def user_login():
 
         # logging in an offline user
         email = input("\nEnter Email Address: ").strip().lower()
-        tls_sock, sock = connect()
-
-        if check_online_status(email, tls_sock):
+        
+        if check_user_state(email):
             print("User is already online!")
             return
-
+        
+        
         login_password = getpass.getpass("Enter Password: ")
 
         if email in existing_users:
@@ -73,12 +73,9 @@ def user_login():
                 print(
                     f"User {existing_users[email]['full_name']} Logged in Successfully!")
 
-                # start sending heartbeats to server for presence checking
-                threading.Thread(target=send_heartbeat, args=(
-                    email, tls_sock, ), daemon=True).start()
-                threading.Thread(target=listener_thread, args=(
-                    tls_sock, ), daemon=True).start()
 
+                tls_sock, sock = connect(email)
+                
                 # call menu from file menu_options.py
                 menu(email, tls_sock, sock)
 
