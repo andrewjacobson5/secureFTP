@@ -23,6 +23,8 @@ connected_users = {}
 lock = threading.Lock()
 
 # --- SERVER FUNCTIONS ---
+
+
 def send_file(sender_sock, sender, receiver):
     try:
         receiver_sock = connected_users[receiver]
@@ -43,20 +45,22 @@ def send_file(sender_sock, sender, receiver):
             print(f"Receiver completed file transfer with message {complete}")
             if complete == "SEND_COMPLETE":
                 sender_sock.sendall(complete.encode('utf-8'))
-                print(f"Sender completed file transfer with message {complete}")
+                print(
+                    f"Sender completed file transfer with message {complete}")
             else:
                 answer = "SEND_DENIED"
                 sender_sock.sendall(answer.encode('utf-8'))
-                
+
     except ConnectionResetError:
         print(f"{sender} or {receiver} disconnected well sending file.\n")
     except Exception as e:
         print(f"Error sending file from {sender} to {receiver} : {e}.\n")
 
+
 def handle_tls_client(conn, addr):
     global connected_users
     global online_users
-    # Handle a single client connection over TLS. 
+    # Handle a single client connection over TLS.
     print(f"Client connected {addr}")
     try:
         while True:
@@ -70,14 +74,15 @@ def handle_tls_client(conn, addr):
             # Decode the received data (user email as heartbeat)
             message = data.decode('utf-8').strip()
 
-            #if get SEND_USER check it for an email, if the email is not online, respond so, if online grab their address
-            #and send to their address a request from the sender to send a file.
+            # if get SEND_USER check it for an email, if the email is not online, respond so, if online grab their address
+            # and send to their address a request from the sender to send a file.
 
             if message.startswith("SEND_USER"):
-                client_email = message.split(":", 1)[1] # get the email after the prefix
+                # get the email after the prefix
+                client_email = message.split(":", 1)[1]
             else:
-                client_email = message # default
-            
+                client_email = message  # default
+
             if message == "GET_USERS":
                 with lock:
                     response = json.dumps(online_users)
@@ -87,7 +92,8 @@ def handle_tls_client(conn, addr):
                 if target_email in online_users:
                     send_file(conn, client_email, target_email)
                 else:
-                    conn.sendall(f"SEND_OFFLINE:{target_email}".encode('utf-8'))
+                    conn.sendall(f"SEND_OFFLINE:{
+                                 target_email}".encode('utf-8'))
             else:
                 # Update online users
                 with lock:
@@ -106,6 +112,7 @@ def handle_tls_client(conn, addr):
                     break
         conn.close()
 
+
 def start_tls_server():
     # Start the TLS server to handle secure client connections.
     try:
@@ -119,8 +126,9 @@ def start_tls_server():
                 print(f"\nServer running on {SERVER_HOST}:{TLS_PORT}")
                 while True:
                     conn, addr = tls_socket.accept()
-                    threading.Thread(target=handle_tls_client, args=(conn, addr, ), daemon=True).start()
-        
+                    threading.Thread(target=handle_tls_client, args=(
+                        conn, addr, ), daemon=True).start()
+
     except Exception:
         print("Error starting TLS server")
         return
@@ -132,8 +140,9 @@ def cleanup_online_users():
         time.sleep(5)  # Check every 5 seconds
         current_time = time.time()
 
-        with lock: 
-            to_remove = [email for email, timestamp in online_users.items() if current_time - timestamp > TIMEOUT]
+        with lock:
+            to_remove = [email for email, timestamp in online_users.items(
+            ) if current_time - timestamp > TIMEOUT]
             # changed the logic here, iterating over the dict's keys directly while modifying it could lead to race conditions
             # also, when `list(online_users.keys())` is called, it is recalculating each time a key is deleted.
             # iterating over `online_users.items()` only once and removing the users after avoids recalculating the keys.
@@ -141,18 +150,20 @@ def cleanup_online_users():
                 del online_users[user]
                 print(f"User {user} marked offline due to timeout.\n")
 
+
 def get_online_users():
     # Retrieve the list of currently online users.
     with lock:
         return list(online_users.keys())
-    
+
 
 if __name__ == "__main__":
     import threading
 
     # Start the mutual TLS server
     print("Starting the TLS server...")
-    tls_server_thread = threading.Thread(target=start_tls_server, daemon=True).start()
+    tls_server_thread = threading.Thread(
+        target=start_tls_server, daemon=True).start()
 
     # Start the cleanup thread
     threading.Thread(target=cleanup_online_users, daemon=True).start()

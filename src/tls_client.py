@@ -18,6 +18,7 @@ CLIENT_KEY = f'{CERTS_DIR}/client_key.pem'
 lock = threading.Lock()  # Ensures thread-safe access to the TLS socket
 request_queue = Queue()  # Queue to handle specific server responses
 
+
 def connect():
     # Connects the client to the server, returns socket
     context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
@@ -31,6 +32,7 @@ def connect():
     except Exception as e:
         print("Error connecting to server:", e)
         return None, None
+
 
 def listener_thread(tls_sock):
     # Continuously listens for server messages
@@ -53,6 +55,7 @@ def listener_thread(tls_sock):
         except Exception as e:
             break
 
+
 def process_request(request, tls_sock):
     # Processes incoming requests
     from menu_options import menu
@@ -67,7 +70,8 @@ def process_request(request, tls_sock):
                 return
 
             sender_email = parts[1].strip()
-            acpt = input(f"{sender_email} wants to send you a file. Accept? (y/n): ")
+            acpt = input(
+                f"{sender_email} wants to send you a file. Accept? (y/n): ")
             response = "SEND_ACCEPT" if acpt.lower() == 'y' else "SEND_DENIED"
             tls_sock.sendall(response.encode('utf-8'))
 
@@ -86,6 +90,7 @@ def process_request(request, tls_sock):
     except Exception as e:
         print(f"Error processing request: {e}")
 
+
 def get_online_users(tls_sock):
     # Fetches user data from the server
     try:
@@ -96,6 +101,7 @@ def get_online_users(tls_sock):
     except Exception:
         # will happen when no users are on
         return {}
+
 
 def send_file(receiver, file_path, tls_sock):
     # Handles sending a file to another user
@@ -125,6 +131,7 @@ def send_file(receiver, file_path, tls_sock):
     except Exception as e:
         print(f"Error sending file: {e}")
 
+
 def send_heartbeat(user_email, tls_sock):
     # Sends a periodic heartbeat to the server
     try:
@@ -135,9 +142,8 @@ def send_heartbeat(user_email, tls_sock):
     except Exception as e:
         print(f"Error sending heartbeat: {e}")
 
+
 def check_online_status(email, tls_sock):
     # Checks if a specific user is online.
     online_users = get_online_users(tls_sock)
     return email in online_users
-
-      

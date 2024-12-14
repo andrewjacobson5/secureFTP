@@ -4,6 +4,7 @@ from keygen import encrypt_file, decrypt_file
 
 USERS_FILE = 'users.json'
 
+
 def load_users():
     if os.path.exists(USERS_FILE):
         with open(USERS_FILE, 'r') as file:
@@ -37,4 +38,3 @@ def save_user(users):
             json.dump(users, file, indent=4)
     else:
         return
-    
