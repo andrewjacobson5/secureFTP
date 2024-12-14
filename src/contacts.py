@@ -6,6 +6,7 @@ Contacts generation
 from utils import safe_load, safe_save
 from tls_client import check_online_status
 
+
 def add_contact(user_email):
     contact_name = input("Enter Contact's Full Name: ").strip()
     contact_email = input("Enter Contact's Email: ").strip()
@@ -16,15 +17,16 @@ def add_contact(user_email):
     if user_email not in users:
         print(f"User {user_email} not found.")
         return
-    
+
     if "contacts" not in users[user_email]:
         users[user_email]["contacts"] = []
-    
+
     # check if the contact already exists
     for contact in users[user_email]["contacts"]:
         if contact["contact_email"] == contact_email:
             contact["contact_name"] = contact_name
-            print(f"Existing contact UPDATED to {contact_name} for email address: {contact_email}\n")
+            print(f"Existing contact UPDATED to {
+                  contact_name} for email address: {contact_email}\n")
             break
     else:  # If no break occurred in the loop, add the new contact
         contact_entry = {
@@ -32,12 +34,13 @@ def add_contact(user_email):
             "contact_email": contact_email
         }
         users[user_email]["contacts"].append(contact_entry)
-        print(f"New contact: {contact_name} with email {contact_email} was added to {user_email}'s contact list\n")
-    
+        print(f"New contact: {contact_name} with email {
+              contact_email} was added to {user_email}'s contact list\n")
+
     safe_save(users)
 
+
 def list_contacts(user_email, tls_sock):
-    from menu_options import menu_options
 
     users = safe_load()
 
@@ -56,7 +59,8 @@ def list_contacts(user_email, tls_sock):
         # Check if reciprocity exists
         if contact_email in users:
             contact_contacts = users[contact_email].get("contacts", [])
-            reciprocated = any(c["contact_email"] == user_email for c in contact_contacts)
+            reciprocated = any(c["contact_email"] ==
+                               user_email for c in contact_contacts)
 
         # Check online status
         online = check_online_status(contact_email, tls_sock)
@@ -67,6 +71,7 @@ def list_contacts(user_email, tls_sock):
         else:
             print(f"No contacts online")
 
+
 def remove_contact(user_email):
     contact_email = input("Enter the Email of the Contact to Remove: ").strip()
 
@@ -76,10 +81,11 @@ def remove_contact(user_email):
     if user_email not in users or "contacts" not in users[user_email]:
         print(f"No contacts found for {user_email}.")
         return
-    
+
     # Find and remove the contact
     contacts = users[user_email]["contacts"]
-    updated_contacts = [contact for contact in contacts if contact["contact_email"] != contact_email]
+    updated_contacts = [
+        contact for contact in contacts if contact["contact_email"] != contact_email]
 
     if len(updated_contacts) == len(contacts):
         print(f"No contact with email {contact_email} found.")

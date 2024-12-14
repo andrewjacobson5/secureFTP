@@ -11,8 +11,10 @@ from user import register_user, user_login
 from keygen import write_key, encrypt_file
 from utils import safe_load
 
-USERS_FILE = 'users.json'  
+USERS_FILE = 'users.json'
 # function to clear any sensitive data when existing the program
+
+
 def secure_exit():
     # enable debug information for garbage collection
     gc.collect()
@@ -23,10 +25,11 @@ def secure_exit():
             print(f"Type: {type(obj)}, Object: {repr(obj)}")
     sys.exit()
 
+
 def user_exist(login_or_register):
-    
+
     while login_or_register:
-        if login_or_register in ['r', 'y']:# decrypt json
+        if login_or_register in ['r', 'y']:
             register_user()
             break
         elif login_or_register == 'l':
@@ -47,15 +50,15 @@ if __name__ == "__main__":
         encrypt_file(USERS_FILE)  # Encrypt the new file
         write_key()
 
-
     while True:
         try:
             with open(USERS_FILE, 'r') as file:
-                data = safe_load() # changed from json.load(file) to safe_load()
+                data = safe_load()  # changed from json.load(file) to safe_load()
 
                 if not data:  # If no users exist
                     print("\nNo users are registered with this client.")
-                    login_or_register = input("\nDo you want to register a new user (y/n)? ").lower()
+                    login_or_register = input(
+                        "\nDo you want to register a new user (y/n)? ").lower()
 
                     if login_or_register == 'y':
                         user_exist('y')
@@ -69,7 +72,8 @@ if __name__ == "__main__":
                 else:
                     while True:
                         print("\nA User Exists in This Machine.")
-                        login_or_register = input("\nEnter 'L' to login, 'R' to register a new user, 'E' to exit: ").lower()
+                        login_or_register = input(
+                            "\nEnter 'L' to login, 'R' to register a new user, 'E' to exit: ").lower()
 
                         if (login_or_register == 'e'):
                             break
@@ -83,4 +87,3 @@ if __name__ == "__main__":
     # Secure exit
     print("Shutting down the application...")
     secure_exit()
-

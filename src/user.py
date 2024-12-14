@@ -5,7 +5,7 @@ User registration and log in file
 
 import getpass
 import threading
-from menu_options import menu_options
+from menu_options import menu
 from utils import safe_load, safe_save
 from encrypt import encrypt_password, check_password
 from tls_client import send_heartbeat, connect, check_online_status, listener_thread
@@ -24,20 +24,20 @@ def register_user():
         return
 
     if password == confirm_password:
-    #if bcrypt.checkpw(confirm_password.encode(), hashed_password):
+        # if bcrypt.checkpw(confirm_password.encode(), hashed_password):
         hashed_password = encrypt_password(password)
-        #hashed_password = bcrypt.hashpw(password.encode(), salt)
+        # hashed_password = bcrypt.hashpw(password.encode(), salt)
         existing_users[email] = {
             "full_name": full_name,
             "password": hashed_password,
             'contacts': []
         }
         print("\nPasswords Matched.")
-        
+
         del password
         del confirm_password
 
-        safe_save(existing_users)  
+        safe_save(existing_users)
         print(f"User {full_name} Registered Successfully!\n")
 
         # The user registration is a one-time process. Once a user is registered on a client, the
@@ -49,6 +49,7 @@ def register_user():
         del password
         del confirm_password
         exit()
+
 
 def user_login():
     existing_users = safe_load()
@@ -62,22 +63,24 @@ def user_login():
         if check_online_status(email, tls_sock):
             print("User is already online!")
             return
-        
-        
+
         login_password = getpass.getpass("Enter Password: ")
 
         if email in existing_users:
             # password is not being stored on a variable to avoid leaking
             if check_password(existing_users[email]['password'], login_password):
                 print("\nWELCOME TO SECUREDROP!")
-                print(f"User {existing_users[email]['full_name']} Logged in Successfully!")
+                print(
+                    f"User {existing_users[email]['full_name']} Logged in Successfully!")
 
                 # start sending heartbeats to server for presence checking
-                threading.Thread(target=send_heartbeat, args=(email, tls_sock, ), daemon=True).start()
-                threading.Thread(target=listener_thread, args=(tls_sock, ), daemon=True).start()
+                threading.Thread(target=send_heartbeat, args=(
+                    email, tls_sock, ), daemon=True).start()
+                threading.Thread(target=listener_thread, args=(
+                    tls_sock, ), daemon=True).start()
 
                 # call menu from file menu_options.py
-                menu_options(email, tls_sock, sock)
+                menu(email, tls_sock, sock)
 
                 return True
             else:
