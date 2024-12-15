@@ -1,6 +1,8 @@
 import os
 import json
 import threading
+import sys
+import gc
 from keygen import encrypt_file, decrypt_file
 
 USERS_FILE = 'users.json'
@@ -51,8 +53,6 @@ def reset_user_state():
     safe_save(users)
 
     
-    
-    
 def set_user_state(email, is_online):
     """
     Updates the user's online state in the user storage.
@@ -82,3 +82,15 @@ def check_user_state(username):
         if not user_found:
             print(f"User '{username}' not found in database.")
             return
+
+
+# function to clear any sensitive data when existing the program
+def secure_exit():
+    # enable debug information for garbage collection
+    gc.collect()
+    # check if there are remaining objects:
+    if gc.garbage:
+        print('Unreachable Objects in Memory:')
+        for obj in gc.garbage:
+            print(f"Type: {type(obj)}, Object: {repr(obj)}")
+    sys.exit()

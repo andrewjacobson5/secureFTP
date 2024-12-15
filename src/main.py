@@ -5,26 +5,13 @@ MAIN
 
 import os
 import json
-import sys
-import gc
 from user import register_user, user_login
 from keygen import write_key, encrypt_file
 from utils import safe_load
+from menu_options import menu
+from utils import secure_exit
 
 USERS_FILE = 'users.json'
-# function to clear any sensitive data when existing the program
-
-
-def secure_exit():
-    # enable debug information for garbage collection
-    gc.collect()
-    # check if there are remaining objects:
-    if gc.garbage:
-        print('Unreachable Objects in Memory:')
-        for obj in gc.garbage:
-            print(f"Type: {type(obj)}, Object: {repr(obj)}")
-    sys.exit()
-
 
 def user_exist(login_or_register):
 
@@ -34,13 +21,12 @@ def user_exist(login_or_register):
             break
         elif login_or_register == 'l':
             print('LOGIN')
-            user_login()
+            user_login(menu)
             break
         else:
             print("Invalid choice, please try again.")
             login_or_register = input("\nEnter Correct Selection: ").lower()
             continue
-
 
 if __name__ == "__main__":
     # Initialize user data

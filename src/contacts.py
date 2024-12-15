@@ -12,7 +12,6 @@ def add_contact(user_email):
 
     users = safe_load()
 
-    # ensure the user exists and initialize the contacts list
     if user_email not in users:
         print(f"User {user_email} not found.")
         return
@@ -20,55 +19,70 @@ def add_contact(user_email):
     if "contacts" not in users[user_email]:
         users[user_email]["contacts"] = []
 
-    # check if the contact already exists
     for contact in users[user_email]["contacts"]:
         if contact["contact_email"] == contact_email:
             contact["contact_name"] = contact_name
-            print(f"Existing contact UPDATED to {
-                  contact_name} for email address: {contact_email}\n")
+            print(f"Existing contact UPDATED to {contact_name} for email address: {contact_email}\n")
             break
-    else:  # If no break occurred in the loop, add the new contact
-        contact_entry = {
+    else:
+        users[user_email]["contacts"].append({
             "contact_name": contact_name,
             "contact_email": contact_email
-        }
-        users[user_email]["contacts"].append(contact_entry)
-        print(f"New contact: {contact_name} with email {
-              contact_email} was added to {user_email}'s contact list\n")
+        })
+        print(f"New contact: {contact_name} with email {contact_email} was added to {user_email}'s contact list.\n")
+
+    # Automatically add reciprocity if the contact exists in the users database
+    if contact_email in users:
+        if "contacts" not in users[contact_email]:
+            users[contact_email]["contacts"] = []
+        if not any(c["contact_email"] == user_email for c in users[contact_email]["contacts"]):
+            users[contact_email]["contacts"].append({
+                "contact_name": users[user_email]["full_name"],
+                "contact_email": user_email
+            })
+            print(f"Reciprocity established: {user_email} added to {contact_email}'s contact list.")
 
     safe_save(users)
 
 
-def list_contacts(user_email):
 
+def list_contacts(user_email):
     users = safe_load()
 
-    if not users[user_email] or not users[user_email]['contacts']:
+    if user_email not in users or not users[user_email].get('contacts'):
         print(f"No contacts found for {user_email}.")
         return
 
     user_contacts = users[user_email]['contacts']
     print(f"{user_email}'s contacts:")
 
+    any_online = False
+
     for contact in user_contacts:
         contact_email = contact["contact_email"]
         contact_name = contact["contact_name"]
         reciprocated = False
+        online = False
 
-        # Check if reciprocity exists
+        # Reciprocity check
         if contact_email in users:
             contact_contacts = users[contact_email].get("contacts", [])
-            reciprocated = any(c["contact_email"] ==
-                               user_email for c in contact_contacts)
+            reciprocated = any(c["contact_email"] == user_email for c in contact_contacts)
 
-        # Check online status
+        # Online status check
         online = check_user_state(contact_email)
 
-        # Display based on conditions online and reciprocated
-        if reciprocated and online:
+        if online:
+            any_online = True
             print(f"- {contact_name} ({contact_email}) [Online]")
+        elif reciprocated:
+            print(f"- {contact_name} ({contact_email}) [Offline, reciprocated]")
         else:
-            print(f"No contacts online")
+            print(f"- {contact_name} ({contact_email}) [Offline, not reciprocated]")
+
+    if not any_online:
+        print("No contacts online.")
+
 
 
 def remove_contact(user_email):
