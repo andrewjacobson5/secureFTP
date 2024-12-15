@@ -56,7 +56,7 @@ if __name__ == "__main__":
                         continue
                 else:
                     while True:
-                        print("\nAn User Exists in This Machine.")
+                        print("\nA User Exists in This Machine.")
                         login_or_register = input(
                             "\nEnter 'L' to login, 'R' to register a new user, 'E' to exit: ").lower()
 

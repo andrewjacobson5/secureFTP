@@ -73,7 +73,7 @@ def listener_thread(tls_sock):
                     sender_email = parts[1].strip()
                     acpt = input(
                         f"{sender_email} wants to send you a file. Accept? (y/n): ")
-                    response = "SEND_ACCEPT" if acpt.lower() == 'y' else "SEND_DENIED"
+                    response = "SEND_ACCEPT" if acpt.lower() == 'y' else "SEND_DENY"
                     tls_sock.sendall(response.encode('utf-8'))
                     
                 with lock:
