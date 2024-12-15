@@ -3,7 +3,8 @@ import ssl
 import time
 import os
 import threading
-from queue import Queue, Empty
+from queue import Queue
+from utils import check_user_state
 
 # Configuration
 SERVER_HOST = '127.0.0.1'
@@ -115,10 +116,6 @@ def process_requests():
                 print("File transfer denied by the recipient.")
                 continue
 
-            elif request.startswith("SEND_OFFLINE"):
-                print("Recipient is offline. File transfer aborted.")
-                continue
-
             elif request.startswith("START_FILE"):
                 print("File transfer initiated.")
                 file_data = request.split("START_FILE:", 1)[1]  # Begin accumulating file data
@@ -154,10 +151,17 @@ def client_send_request(tls_sock, user_email):
     receiver = input("Enter Reciever's email: ").strip()
     file_path = input("Enter the file's path: ").strip()
     
-    if not os.path.exists(file_path):
+    # check if user online 
+    if not check_user_state(receiver):
+        print(f"Error in FTP: Recipient user {receiver} is not online.")
+        return
+    
+    # check if file exists
+    elif not os.path.exists(file_path):
         print("Error in FTP: File does not exist.")
         return
     
+    # send ASK_USER request to server
     with lock:
         tls_sock.sendall(f"ASK_USER:{user_email}:{receiver}".encode('utf-8'))
 
