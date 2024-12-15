@@ -3,6 +3,12 @@ COMP 2300 Fall 2024 Class Project Secure Drop
 MAIN
 """
 
+"""
+GIT TEST COMMENT
+"""
+
+
+
 import os
 import json
 from user import register_user, user_login
