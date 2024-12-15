@@ -2,7 +2,6 @@
 COMP 2300 Fall 2024 Class Project Secure Drop
 MAIN
 """
-
 import os
 import json
 from user import register_user, user_login
@@ -57,7 +56,7 @@ if __name__ == "__main__":
                         continue
                 else:
                     while True:
-                        print("\nA User Exists in This Machine.")
+                        print("\nAn User Exists in This Machine.")
                         login_or_register = input(
                             "\nEnter 'L' to login, 'R' to register a new user, 'E' to exit: ").lower()
 
