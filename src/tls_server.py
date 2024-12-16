@@ -5,6 +5,7 @@ import time
 import queue
 from utils import set_user_state
 
+
 # Configuration
 SERVER_HOST = '127.0.0.1'
 TLS_PORT = 8443
@@ -20,6 +21,7 @@ CLIENT_KEY = f'{CERTS_DIR}/client_key.pem'
 # tracks which connection is which email
 connected_users = {}
 lock = threading.Lock()
+active_transfer = {}
 
 # --- SERVER FUNCTIONS ---
 
@@ -28,21 +30,31 @@ def handle_tls_client(client_sock, client_email):
     Handles communication with a single client.
     """
     response_queue = queue.Queue()  # Local queue for storing responses
-
     while True:
+        file_trans = active_transfer[client_email][0]
+        file_receiver_email = active_transfer[client_email][1]
+        print(f"TRANS: {file_trans} | {file_receiver_email}")
         try:
             # Check for new requests from the client
             request = client_sock.recv(4096).decode('utf-8')
             if not request:
                 break
 
-            # Route responses to the response_queue
-            if request in ["SEND_ACCEPT", "SEND_DENY"]:
-                response_queue.put(request)
-                continue
+            # Routes accept and deny to the original senders queue
+            elif request.startswith("SEND_ACCEPT:") or request.startswith("SEND_DENY:"):
+                parts = request.split(":")
+                message = parts[0].strip()
+                sender_email = parts[1].strip()
+                receiver_email = parts[2].strip()
+                sender_queue = connected_users[sender_email][1]
+                sender_queue.put(message)
+                if request.startswith("SEND_ACCEPT:"):
+                    print(f"file transfer begining")
+                    active_transfer[sender_email] = [True, receiver_email]
+                    #forward_file(client_sock, connected_users[receiver_email][0])
 
             # Handle SEND_USER requests
-            if request.startswith("ASK_USER:"):
+            elif request.startswith("ASK_USER:"):
                 parts = request.split(":")
                 if len(parts) < 3:
                     print("Invalid ASK_USER format.")
@@ -63,16 +75,29 @@ def handle_tls_client(client_sock, client_email):
                     receiver_queue = connected_users[receiver_email][1]
                     receiver_queue.put(f"SEND_REQUEST:{sender_email}")
 
-                    # Wait for receiver's response
-                    response = response_queue.get(timeout=10)  # Wait for response
-                    if response == "SEND_ACCEPT":
-                        client_sock.sendall(b"SEND_ACCEPT")
-                        forward_file(client_sock, connected_users[receiver_email][0])
-                    else:
-                        client_sock.sendall(b"SEND_DENY")
-            elif request.startswith("START_FILE"):
-                print("Receiving a file...")
-                receive_file(client_sock)
+
+            elif request.startswith("FILE_NAME"):
+                if file_trans is True:
+                    receiver_queue = connected_users[file_receiver_email][1]
+                    receiver_queue.put(request)
+                else:
+                    print("Alert: File name sent not during file transfer")
+
+            elif request.startswith("FILE"):
+                if file_trans is True:
+                    receiver_queue = connected_users[file_receiver_email][1]
+                    receiver_queue.put(request)
+                else:
+                    print("Alert: File packet sent not during file transfer")
+
+            elif request.startswith("END_FILE"):
+                if file_trans is True:
+                    receiver_queue = connected_users[file_receiver_email][1]
+                    receiver_queue.put(request)
+                    active_transfer[client_email] = (False, "")
+                else:
+                    print("Alert: File end sent not during file transfer")
+
             elif request.startswith("HEARTBEAT"):
                 parts = request.split(":")
                 if len(parts) < 2:
@@ -96,43 +121,6 @@ def handle_tls_client(client_sock, client_email):
             set_user_state(client_email, False)
             print(f"Client {client_email} removed.")
 
-        
-
-def forward_file(sender_sock, receiver_sock):
-    """
-    Forwards a file from the sender to the receiver.
-    """
-    try:
-        # Receive file name
-        file_name = sender_sock.recv(4096).decode('utf-8').strip()
-        receiver_sock.sendall(file_name.encode('utf-8'))
-
-        # Forward file data
-        while True:
-            chunk = sender_sock.recv(4096)
-            if chunk.endswith(b"SEND_COMPLETE"):
-                receiver_sock.sendall(chunk)
-                break
-            receiver_sock.sendall(chunk)
-        print("File transfer completed.")
-    except Exception as e:
-        print(f"Error forwarding file: {e}")
-
-
-def receive_file(client_sock):
-    """
-    Receives a file and stores it locally.
-    """
-    file_name = client_sock.recv(4096).decode('utf-8').strip()
-    with open(file_name, "wb") as file:
-        while True:
-            data = client_sock.recv(4096)
-            if data.endswith(b"SEND_COMPLETE"):
-                file.write(data[:-len(b"SEND_COMPLETE")])
-                break
-            file.write(data)
-    print(f"File saved as {file_name}")
-
 
 def process_client_queue(client_email):
     """
@@ -145,6 +133,7 @@ def process_client_queue(client_email):
         try:
             # Get the next request from the queue
             request = client_queue.get()
+            print(f"QUEUE: {client_email} | {request}")
             if request.startswith("SEND_REQUEST:"):
                 sender_email = request.split(":")[1].strip()
 
@@ -152,18 +141,24 @@ def process_client_queue(client_email):
                 try:
                     message = f"SEND_REQUEST:{sender_email}"
                     client_sock.sendall(message.encode('utf-8'))  # Send request to the recipient
-
-                    # Wait for the recipient's response
-                    response = client_sock.recv(4096).decode('utf-8').strip().lower()
-
-                    # Validate the response
-                    if response == 'y':
-                        client_queue.put("SEND_ACCEPT")  # Notify the server that the request is accepted
-                    else:
-                        client_queue.put("SEND_DENY")  # Notify the server that the request is denied
                 except Exception as e:
                     print(f"Error communicating with recipient {client_email}: {e}")
                     client_queue.put("SEND_DENY")  # Default to denial on error
+
+                # Validate the response
+            if request == "SEND_ACCEPT" or request == "SEND_DENY":
+                try:
+                    message = request
+                    client_sock.sendall(message.encode('utf-8'))
+                except Exception as e:
+                    print(f"Error communicating with recipient {client_email}: {e}")
+
+            if request.startswith("FILE_NAME") or request.startswith("FILE") or request.startswith("END_FILE"):
+                try:
+                    client_sock.sendall(request.encode('utf-8'))
+                except Exception as e:
+                    print(f"Error communicating file, file_name, end_file with recipient {client_email}: {e}")
+            
         except Exception as e:
             print(f"Error processing queue for {client_email}: {e}")
             break
@@ -204,6 +199,7 @@ def start_tls_server():
                 # Create a queue for the client
                 with lock:
                     connected_users[client_email] = (client_sock, queue.Queue())
+                    active_transfer[client_email] = (False, "")
 
                 # Start threads for handling client and queue
                 threading.Thread(target=handle_tls_client, args=(client_sock, client_email), daemon=True).start()
