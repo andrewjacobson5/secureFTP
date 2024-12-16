@@ -101,7 +101,7 @@ def listener_thread(user_email, tls_sock):
                         return
 
                     sender_email = parts[1].strip()
-                    print(f"{sender_email} wants to send you a file.")
+                    print(f"\n{sender_email} wants to send you a file.")
                     acpt = input(
                         "Accept? (y/n): ")
                     response = "SEND_ACCEPT" if acpt.lower() == 'y' else "SEND_DENY"
@@ -109,7 +109,7 @@ def listener_thread(user_email, tls_sock):
                     #tls_sock.sendall(message.encode('utf-8'))
                     sendall_seq(tls_sock, message.encode('utf-8'))
                     if response == "SEND_ACCEPT": 
-                        print("Accepting file transfer")
+                        print("\nAccepting file transfer")
                 else:    
                     with lock:
                         request_queue.put(data)  # Add data to the queue
@@ -150,7 +150,7 @@ def process_requests(tls_sock):
             if request.startswith("SEND_ACCEPT"):
                 #print(file_path)
                 file_name = file_path.split("/")[-1]
-                print(f"File transfer accepted. Sending file {file_name}...")
+                print(f"\nFile transfer accepted. Sending file {file_name}...")
                 send_file(file_name, tls_sock)
                 continue  # File transfer logic will follow
 
