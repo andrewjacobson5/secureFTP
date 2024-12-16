@@ -4,7 +4,9 @@ import time
 import os
 import threading
 import random
-from queue import Queue, Empty
+from queue import Queue
+from utils import check_user_state
+
 
 # Configuration
 SERVER_HOST = '127.0.0.1'
@@ -214,16 +216,22 @@ def save_file(file_name, file_data):
 
         
 def client_send_request(tls_sock, user_email):
+    #send ASK_USER request to server
     global file_path
     receiver = input("Enter Reciever's email: ").strip()
     file_path = input("Enter the file's path: ").strip()
     
-    if not os.path.exists(file_path):
+    # check if user online 
+    if not check_user_state(receiver):
+        print(f"Error in FTP: Recipient user {receiver} is not online.")
+        return
+    
+    # check if file exists
+    elif not os.path.exists(file_path):
         print("Error in FTP: File does not exist.")
         file_path = ""
         return
     #print(file_path)
-
     with lock:
         #tls_sock.sendall(f"ASK_USER:{user_email}:{receiver}".encode('utf-8'))
         sendall_seq(tls_sock, f"ASK_USER:{user_email}:{receiver}".encode('utf-8'))

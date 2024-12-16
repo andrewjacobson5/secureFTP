@@ -94,7 +94,6 @@ def handle_tls_client(client_sock, client_email):
                 sender_email = parts[1].strip()
                 receiver_email = parts[2].strip()
 
-                # Check if the receiver is online
                 with lock:
                     if receiver_email not in connected_users:
                         #client_sock.sendall(b"SEND_OFFLINE")
