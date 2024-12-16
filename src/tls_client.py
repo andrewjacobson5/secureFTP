@@ -3,6 +3,7 @@ import ssl
 import time
 import os
 import threading
+import random
 from queue import Queue, Empty
 
 # Configuration
@@ -18,6 +19,32 @@ lock = threading.Lock()  # Ensures thread-safe access to the TLS socket
 request_queue = Queue()  # Queue to handle specific server responses
 file_path = "" #saves the file path during transfer
 
+client_sequence = random.randint(0, 16777216)
+server_sequence = 0
+
+def sendall_seq(sock, data):
+    try:
+        global client_sequence
+        mdata = f"|{str(client_sequence)}".encode('utf-8')
+        sock.sendall(data + mdata)
+        client_sequence += 1
+    except Exception as e:
+        print(f"Error in sendall_seq: {e}")
+
+def recv_seq(sock, length):
+    try:
+        global server_sequence
+        data = sock.recv(length + 33)
+        message = data.decode('utf-8').split("|")
+        #print(message)
+        seq = int(message[1])
+        if seq < server_sequence:
+            print("Sequence not in order.")
+        else:
+            server_sequence = seq
+            return message[0]
+    except Exception as e:
+        print(f"Error in recv_seq: {e}")
 
 def connect(email):
     """
@@ -62,7 +89,8 @@ def connect(email):
 def listener_thread(user_email, tls_sock):
     try:
         while True:
-            data = tls_sock.recv(4096).decode('utf-8')
+            #data = tls_sock.recv(4096).decode('utf-8')
+            data = recv_seq(tls_sock, 4096)
             if data:
                 if data.startswith("SEND_REQUEST"):
                     parts = data.split(":", 1)
@@ -76,7 +104,8 @@ def listener_thread(user_email, tls_sock):
                         "Accept? (y/n): ")
                     response = "SEND_ACCEPT" if acpt.lower() == 'y' else "SEND_DENY"
                     message = f"{response}:{sender_email}:{user_email}"
-                    tls_sock.sendall(message.encode('utf-8'))
+                    #tls_sock.sendall(message.encode('utf-8'))
+                    sendall_seq(tls_sock, message.encode('utf-8'))
                     if response == "SEND_ACCEPT": 
                         print("Accepting file transfer")
                 else:    
@@ -96,7 +125,8 @@ def send_heartbeat(user_email, tls_sock):
     try:
         while True:
             with lock:
-                tls_sock.sendall(f"HEARTBEAT:{user_email}".encode('utf-8'))
+                #tls_sock.sendall(f"HEARTBEAT:{user_email}".encode('utf-8'))
+                sendall_seq(tls_sock, f"HEARTBEAT:{user_email}".encode('utf-8'))
             time.sleep(5)  # Send heartbeat every 5 seconds
     except Exception as e:
         print(f"Error sending heartbeat: {e}")
@@ -135,7 +165,7 @@ def process_requests(tls_sock):
                 print(f"receiving {file_name}")
 
             elif request.startswith("FILE:"):
-                print("File packet")
+                #print("File packet")
                 file_data += request.split("FILE:", 1)[1]  # Begin accumulating file data
 
             elif "END_FILE" in request:
@@ -155,15 +185,18 @@ def process_requests(tls_sock):
 def send_file(file_name, tls_sock):
     with lock:
         try:
-            tls_sock.sendall(f"FILE_NAME:{file_name}".encode('utf-8'))
+            #tls_sock.sendall(f"FILE_NAME:{file_name}".encode('utf-8'))
+            sendall_seq(tls_sock, f"FILE_NAME:{file_name}".encode('utf-8'))
             with open(file_path, "rb") as file:
                 while True:
                     data = file.read(1024)
                     if not data:
-                        tls_sock.sendall(f"END_FILE".encode('utf-8'))
+                        #tls_sock.sendall(f"END_FILE".encode('utf-8'))
+                        sendall_seq(tls_sock, f"END_FILE".encode('utf-8'))
                         break
                     else:
-                        tls_sock.sendall(f"FILE:{data}".encode('utf-8'))
+                        #tls_sock.sendall(f"FILE:{data}".encode('utf-8'))
+                        sendall_seq(tls_sock, f"FILE:{data}".encode('utf-8'))
         except Exception as e:
             print(f"Error sending file: {e}")
     
@@ -192,6 +225,7 @@ def client_send_request(tls_sock, user_email):
     #print(file_path)
 
     with lock:
-        tls_sock.sendall(f"ASK_USER:{user_email}:{receiver}".encode('utf-8'))
+        #tls_sock.sendall(f"ASK_USER:{user_email}:{receiver}".encode('utf-8'))
+        sendall_seq(tls_sock, f"ASK_USER:{user_email}:{receiver}".encode('utf-8'))
 
 

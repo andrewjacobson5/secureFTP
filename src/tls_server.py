@@ -3,6 +3,7 @@ import ssl
 import threading
 import time
 import queue
+import random
 from utils import set_user_state
 
 
@@ -23,6 +24,31 @@ connected_users = {}
 lock = threading.Lock()
 active_transfer = {}
 
+server_sequence = random.randint(0, 16777216)
+
+def sendall_seq(sock, data):
+    try:
+        global server_sequence
+        mdata = f"|{str(server_sequence)}".encode('utf-8')
+        sock.sendall(data + mdata)
+        server_sequence += 1
+    except Exception as e:
+        print(f"Error in sendall_seq: {e}")
+
+def recv_seq(sock, length, sequence):
+    try:
+        data = sock.recv(length + 33)
+        message = data.decode('utf-8').split("|")
+        seq = int(message[1])
+        #print(f"{sequence} < {seq}")
+        if seq < sequence:
+            print("Sequence not in order.")
+        else:
+            return message[0], seq
+    except Exception as e:
+        print(f"Error in recv_seq: {e}")
+
+
 # --- SERVER FUNCTIONS ---
 
 def handle_tls_client(client_sock, client_email):
@@ -30,13 +56,16 @@ def handle_tls_client(client_sock, client_email):
     Handles communication with a single client.
     """
     response_queue = queue.Queue()  # Local queue for storing responses
+    sequence = 0 #local sequence for the client
     while True:
         file_trans = active_transfer[client_email][0]
         file_receiver_email = active_transfer[client_email][1]
         print(f"TRANS: {file_trans} | {file_receiver_email}")
         try:
             # Check for new requests from the client
-            request = client_sock.recv(4096).decode('utf-8')
+            #request = client_sock.recv(4096).decode('utf-8')
+            request, sequence = recv_seq(client_sock, 4096, sequence)
+            #print(f"request {request}")
             if not request:
                 break
 
@@ -58,7 +87,8 @@ def handle_tls_client(client_sock, client_email):
                 parts = request.split(":")
                 if len(parts) < 3:
                     print("Invalid ASK_USER format.")
-                    client_sock.sendall(b"SEND_DENY")
+                    #client_sock.sendall(b"SEND_DENY")
+                    sendall_seq(client_sock, b"SEND_DENY")
                     continue
 
                 sender_email = parts[1].strip()
@@ -67,7 +97,8 @@ def handle_tls_client(client_sock, client_email):
                 # Check if the receiver is online
                 with lock:
                     if receiver_email not in connected_users:
-                        client_sock.sendall(b"SEND_OFFLINE")
+                        #client_sock.sendall(b"SEND_OFFLINE")
+                        sendall_seq(client_sock, b"SEND_OFFLINE")
                         print(f"{receiver_email} is offline.")
                         continue
 
@@ -109,7 +140,8 @@ def handle_tls_client(client_sock, client_email):
                 print(f"Unknown request: {request}")
         except queue.Empty:
             print(f"No response received for {client_email}.")
-            client_sock.sendall(b"SEND_DENY")
+            #client_sock.sendall(b"SEND_DENY")
+            sendall_seq(client_sock, b"SEND_DENY")
         except Exception as e:
             print(f"Error handling client {client_email}: {e}")
             break
@@ -140,7 +172,8 @@ def process_client_queue(client_email):
                 # Notify the recipient and get their response
                 try:
                     message = f"SEND_REQUEST:{sender_email}"
-                    client_sock.sendall(message.encode('utf-8'))  # Send request to the recipient
+                    #client_sock.sendall(message.encode('utf-8'))  # Send request to the recipient
+                    sendall_seq(client_sock, message.encode('utf-8'))
                 except Exception as e:
                     print(f"Error communicating with recipient {client_email}: {e}")
                     client_queue.put("SEND_DENY")  # Default to denial on error
@@ -149,13 +182,15 @@ def process_client_queue(client_email):
             if request == "SEND_ACCEPT" or request == "SEND_DENY":
                 try:
                     message = request
-                    client_sock.sendall(message.encode('utf-8'))
+                    #client_sock.sendall(message.encode('utf-8'))
+                    sendall_seq(client_sock, message.encode('utf-8'))
                 except Exception as e:
                     print(f"Error communicating with recipient {client_email}: {e}")
 
             if request.startswith("FILE_NAME") or request.startswith("FILE") or request.startswith("END_FILE"):
                 try:
-                    client_sock.sendall(request.encode('utf-8'))
+                    #client_sock.sendall(request.encode('utf-8'))
+                    sendall_seq(client_sock, request.encode('utf-8'))
                 except Exception as e:
                     print(f"Error communicating file, file_name, end_file with recipient {client_email}: {e}")
             
@@ -185,7 +220,9 @@ def start_tls_server():
                     
             while True:
                 client_sock, addr = tls_sock.accept()
-                client_beat = client_sock.recv(1024).decode('utf-8').strip()  # First message is the client's email
+                #client_beat = client_sock.recv(1024).decode('utf-8').strip()  # First message is the client's email
+                client_beat, seq = recv_seq(client_sock, 1024, 0)
+                client_beat = client_beat.strip()
                 
                 parts = client_beat.split(":")
                 if len(parts) < 2 and parts[0] != "HEARTBEAT":
